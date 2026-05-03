@@ -10,9 +10,9 @@ const seedEvents = async () => {
   try {
     await connectDB();
 
-    const admin = await User.findOne({ role: "admin" });
-    if (!admin) {
-      console.log("No admin found. Please run seedAdmin.js first.");
+    const org = await User.findOne({ role: "organization" });
+    if (!org) {
+      console.log("No organization found. Please run seedOrganization.js first.");
       process.exit(1);
     }
 
@@ -28,7 +28,7 @@ const seedEvents = async () => {
         current_count: 142,
         organizer: "Computer Science Dept.",
         status: "upcoming",
-        createdBy: admin._id,
+        createdBy: org._id,
       },
       {
         title: "Global AI Summit 2026",
@@ -41,7 +41,7 @@ const seedEvents = async () => {
         current_count: 230,
         organizer: "AI Research Lab",
         status: "upcoming",
-        createdBy: admin._id,
+        createdBy: org._id,
       },
       {
         title: "Campus Coding Hackathon v5.0",
@@ -54,7 +54,7 @@ const seedEvents = async () => {
         current_count: 198,
         organizer: "Student Tech Club",
         status: "upcoming",
-        createdBy: admin._id,
+        createdBy: org._id,
       },
       {
         title: "Annual Cultural Fest: Nebula",
@@ -67,7 +67,7 @@ const seedEvents = async () => {
         current_count: 850,
         organizer: "Cultural Council",
         status: "upcoming",
-        createdBy: admin._id,
+        createdBy: org._id,
       },
       {
         title: "Cybersecurity Bootcamp",
@@ -80,7 +80,7 @@ const seedEvents = async () => {
         current_count: 50,
         organizer: "CyberSec Society",
         status: "completed",
-        createdBy: admin._id,
+        createdBy: org._id,
       }
     ];
 

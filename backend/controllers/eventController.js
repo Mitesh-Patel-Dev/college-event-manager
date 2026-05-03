@@ -4,11 +4,11 @@ import Registration from "../models/Registration.js";
 // ─────────────────────────────────────────────────────────────────────
 // @desc    Create a new event
 // @route   POST /api/events
-// @access  Private/Admin
+// @access  Private/Organization
 // ─────────────────────────────────────────────────────────────────────
 export const createEvent = async (req, res, next) => {
   try {
-    // Attach the admin user who is creating the event
+    // Attach the organization user who is creating the event
     req.body.createdBy = req.user._id;
 
     const event = await Event.create(req.body);
@@ -85,7 +85,7 @@ export const getEventById = async (req, res, next) => {
 // ─────────────────────────────────────────────────────────────────────
 // @desc    Update an event
 // @route   PUT /api/events/:id
-// @access  Private/Admin
+// @access  Private/Organization
 // ─────────────────────────────────────────────────────────────────────
 export const updateEvent = async (req, res, next) => {
   try {
@@ -120,7 +120,7 @@ export const updateEvent = async (req, res, next) => {
 // ─────────────────────────────────────────────────────────────────────
 // @desc    Delete an event (and all associated registrations)
 // @route   DELETE /api/events/:id
-// @access  Private/Admin
+// @access  Private/Organization
 // ─────────────────────────────────────────────────────────────────────
 export const deleteEvent = async (req, res, next) => {
   try {
@@ -151,7 +151,7 @@ export const deleteEvent = async (req, res, next) => {
 // ─────────────────────────────────────────────────────────────────────
 // @desc    Get all students registered for a specific event
 // @route   GET /api/events/:id/registrations
-// @access  Private/Admin
+// @access  Private/Organization
 // ─────────────────────────────────────────────────────────────────────
 export const getEventRegistrations = async (req, res, next) => {
   try {

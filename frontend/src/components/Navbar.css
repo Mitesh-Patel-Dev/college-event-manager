@@ -130,7 +130,7 @@
   border-radius: var(--radius-full);
 }
 
-.role-badge.admin {
+.role-badge.organization {
   background: rgba(203, 166, 247, 0.2);
   color: var(--accent-mauve);
 }

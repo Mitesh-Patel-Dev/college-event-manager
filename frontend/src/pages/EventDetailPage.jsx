@@ -21,7 +21,7 @@ export default function EventDetailPage() {
   const navigate = useNavigate();
   const { currentEvent, fetchEventById, isLoading } = useEventStore();
   const { registerForEvent, cancelRegistration, checkRegistration, isLoading: regLoading } = useRegistrationStore();
-  const { user, token } = useAuthStore();
+  const { user, token, isOrganization } = useAuthStore();
 
   const [isRegistered, setIsRegistered] = useState(false);
   const [checkingReg, setCheckingReg] = useState(true);
@@ -47,8 +47,8 @@ export default function EventDetailPage() {
       navigate("/login");
       return;
     }
-    if (user?.role === "admin") {
-      toast.error("Admins cannot register for events");
+    if (user?.role === "organization") {
+      toast.error("Organizations cannot apply for events");
       return;
     }
     try {
@@ -56,7 +56,7 @@ export default function EventDetailPage() {
       setIsRegistered(true);
       // Refresh event to show updated seat count
       fetchEventById(id);
-      toast.success("Successfully registered! 🎉");
+      toast.success("Successfully applied! 🎉");
     } catch (err) {
       toast.error(err.message);
     }
@@ -67,7 +67,7 @@ export default function EventDetailPage() {
       await cancelRegistration(id);
       setIsRegistered(false);
       fetchEventById(id);
-      toast.success("Registration cancelled");
+      toast.success("Application cancelled");
     } catch (err) {
       toast.error(err.message);
     }
@@ -159,7 +159,7 @@ export default function EventDetailPage() {
           {/* ─── Sidebar ─────────────────────────────────────── */}
           <div className="event-detail-sidebar">
             <div className="registration-card">
-              <h3 className="reg-card-title">Registration</h3>
+              <h3 className="reg-card-title">Application</h3>
 
               {/* Seat Display */}
               <div className="seat-display">
@@ -190,7 +190,7 @@ export default function EventDetailPage() {
               ) : isRegistered ? (
                 <>
                   <div className="reg-status confirmed">
-                    <FiCheckCircle /> You're registered!
+                    <FiCheckCircle /> You've Applied!
                   </div>
                   <button
                     className="btn btn-danger btn-full"
@@ -199,7 +199,7 @@ export default function EventDetailPage() {
                     id="cancel-registration-btn"
                   >
                     {regLoading ? <span className="spinner spinner-sm" /> : <FiXCircle />}
-                    Cancel Registration
+                    Cancel Application
                   </button>
                 </>
               ) : (
@@ -214,14 +214,14 @@ export default function EventDetailPage() {
                   ) : isFull ? (
                     <><FiXCircle /> Event Full</>
                   ) : (
-                    <><FiCheckCircle /> Register Now</>
+                    <><FiCheckCircle /> Apply Now</>
                   )}
                 </button>
               )}
 
               {!token && (
                 <p className="login-prompt">
-                  <a href="/login">Login</a> to register for this event
+                  <a href="/login">Login</a> to apply for this event
                 </p>
               )}
             </div>

@@ -15,16 +15,16 @@ const router = express.Router();
 router.get("/", getAllEvents);
 router.get("/:id", getEventById);
 
-// Admin-only routes
-router.post("/", protect, authorizeRoles("admin"), createEvent);
-router.put("/:id", protect, authorizeRoles("admin"), updateEvent);
-router.delete("/:id", protect, authorizeRoles("admin"), deleteEvent);
+// Organization-only routes
+router.post("/", protect, authorizeRoles("organization"), createEvent);
+router.put("/:id", protect, authorizeRoles("organization"), updateEvent);
+router.delete("/:id", protect, authorizeRoles("organization"), deleteEvent);
 
-// Admin: View registrations for a specific event
+// Organization: View registrations for a specific event
 router.get(
   "/:id/registrations",
   protect,
-  authorizeRoles("admin"),
+  authorizeRoles("organization"),
   getEventRegistrations
 );
 

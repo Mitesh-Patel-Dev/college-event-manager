@@ -18,8 +18,8 @@ const useAuthStore = create((set, get) => ({
   get isAuthenticated() {
     return !!get().token;
   },
-  get isAdmin() {
-    return get().user?.role === "admin";
+  get isOrganization() {
+    return get().user?.role === "organization";
   },
 
   // ─── Actions ─────────────────────────────────────────────────────

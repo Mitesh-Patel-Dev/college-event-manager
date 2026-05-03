@@ -10,7 +10,7 @@ import RegisterPage from "./pages/RegisterPage";
 import EventsPage from "./pages/EventsPage";
 import EventDetailPage from "./pages/EventDetailPage";
 import StudentDashboard from "./pages/StudentDashboard";
-import AdminDashboard from "./pages/AdminDashboard";
+import OrganizationDashboard from "./pages/OrganizationDashboard";
 
 // ─── Route Guards ────────────────────────────────────────────
 const PrivateRoute = ({ children }) => {
@@ -18,17 +18,17 @@ const PrivateRoute = ({ children }) => {
   return token ? children : <Navigate to="/login" replace />;
 };
 
-const AdminRoute = ({ children }) => {
+const OrganizationRoute = ({ children }) => {
   const { token, user } = useAuthStore();
   if (!token) return <Navigate to="/login" replace />;
-  if (user?.role !== "admin") return <Navigate to="/dashboard" replace />;
+  if (user?.role !== "organization") return <Navigate to="/dashboard" replace />;
   return children;
 };
 
 const GuestRoute = ({ children }) => {
   const { token, user } = useAuthStore();
   if (!token) return children;
-  return <Navigate to={user?.role === "admin" ? "/admin" : "/dashboard"} replace />;
+  return <Navigate to={user?.role === "organization" ? "/organization" : "/dashboard"} replace />;
 };
 
 // ─── App ────────────────────────────────────────────────────
@@ -51,7 +51,7 @@ export default function App() {
           <Route path="/dashboard" element={<PrivateRoute><StudentDashboard /></PrivateRoute>} />
 
           {/* Admin protected */}
-          <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+          <Route path="/organization" element={<OrganizationRoute><OrganizationDashboard /></OrganizationRoute>} />
 
           {/* Fallback */}
           <Route path="*" element={<Navigate to="/" replace />} />

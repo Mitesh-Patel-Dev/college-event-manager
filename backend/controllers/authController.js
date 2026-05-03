@@ -61,7 +61,7 @@ export const registerUser = async (req, res, next) => {
 };
 
 // ─────────────────────────────────────────────────────────────────────
-// @desc    Login user (student or admin)
+// @desc    Login user (student or organization)
 // @route   POST /api/auth/login
 // @access  Public
 // ─────────────────────────────────────────────────────────────────────

@@ -42,9 +42,9 @@ export default function Navbar() {
               Dashboard
             </Link>
           )}
-          {token && user?.role === "admin" && (
-            <Link to="/admin" className={`nav-link ${isActive("/admin") ? "active" : ""}`}>
-              Admin Panel
+          {token && user?.role === "organization" && (
+            <Link to="/organization" className={`nav-link ${isActive("/organization") ? "active" : ""}`}>
+              Dashboard
             </Link>
           )}
         </nav>
@@ -58,8 +58,8 @@ export default function Navbar() {
                   {user?.name?.charAt(0).toUpperCase()}
                 </div>
                 <span className="user-name">{user?.name?.split(" ")[0]}</span>
-                <span className={`role-badge ${user?.role === "admin" ? "admin" : "student"}`}>
-                  {user?.role}
+                <span className={`role-badge ${user?.role === "organization" ? "organization" : "student"}`}>
+                  {user?.role === "organization" ? "Organization" : "Student"}
                 </span>
               </div>
               <button className="btn btn-ghost btn-sm" onClick={handleLogout} id="logout-btn">
@@ -95,9 +95,9 @@ export default function Navbar() {
               <FiUser size={15} /> Dashboard
             </Link>
           )}
-          {token && user?.role === "admin" && (
-            <Link to="/admin" className="mobile-link" onClick={() => setMenuOpen(false)}>
-              <FiGrid size={15} /> Admin Panel
+          {token && user?.role === "organization" && (
+            <Link to="/organization" className="mobile-link" onClick={() => setMenuOpen(false)}>
+              Dashboard
             </Link>
           )}
           {token ? (

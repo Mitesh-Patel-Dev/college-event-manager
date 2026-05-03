@@ -17,7 +17,7 @@ export default function LoginPage() {
     try {
       const data = await login(form);
       toast.success(`Welcome back, ${data.user.name.split(" ")[0]}! 👋`);
-      navigate(data.user.role === "admin" ? "/admin" : "/dashboard");
+      navigate(data.user.role === "organization" ? "/organization" : "/dashboard");
     } catch (err) {
       toast.error(err.message);
     }
@@ -92,7 +92,7 @@ export default function LoginPage() {
 
         {/* Admin hint */}
         <div className="auth-hint">
-          <p>Default Admin: <code>admin@college.edu</code> / <code>admin123</code></p>
+          <p>Default Organization: <code>org@college.edu</code> / <code>orgpassword123</code></p>
         </div>
       </div>
     </div>

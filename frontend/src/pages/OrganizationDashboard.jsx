@@ -5,7 +5,7 @@ import {
 } from "react-icons/fi";
 import toast from "react-hot-toast";
 import useEventStore from "../store/eventStore";
-import "./AdminDashboard.css";
+import "./OrganizationDashboard.css";
 
 const CATEGORIES = [
   "Workshop", "Seminar", "Cultural", "Sports",
@@ -18,7 +18,7 @@ const EMPTY_FORM = {
   time: "", venue: "", max_capacity: "", organizer: "", status: "upcoming",
 };
 
-export default function AdminDashboard() {
+export default function OrganizationDashboard() {
   const { events, fetchEvents, createEvent, updateEvent, deleteEvent,
     fetchEventRegistrations, isLoading } = useEventStore();
 
@@ -107,8 +107,8 @@ export default function AdminDashboard() {
         {/* ─── Header ──────────────────────────────────────── */}
         <div className="admin-header">
           <div>
-            <h1 className="section-title">Admin Panel</h1>
-            <p className="section-subtitle">Manage all campus events</p>
+            <h1 className="section-title">Organization Panel</h1>
+            <p className="section-subtitle">Manage all your campus events</p>
           </div>
           <button className="btn btn-primary" onClick={openCreate} id="create-event-btn">
             <FiPlus /> Create Event

@@ -52,9 +52,8 @@ export const protect = async (req, res, next) => {
  * authorizeRoles — Role-Based Authorization Middleware
  * ---
  * Restricts route access to specified roles.
- * Must be used AFTER the `protect` middleware.
- *
- * Usage: authorizeRoles("admin") or authorizeRoles("student", "admin")
+ * Middleware to authorize specific roles (e.g., only organizations).
+ * Usage: authorizeRoles("organization") or authorizeRoles("student", "organization")
  */
 export const authorizeRoles = (...roles) => {
   return (req, res, next) => {
