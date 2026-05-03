@@ -141,3 +141,39 @@ export const getMe = async (req, res, next) => {
     next(error);
   }
 };
+
+// ─────────────────────────────────────────────────────────────────────
+// @desc    TEMPORARY: Seed Organization Account
+// @route   GET /api/auth/seed-org
+// @access  Public
+// ─────────────────────────────────────────────────────────────────────
+export const seedOrg = async (req, res, next) => {
+  try {
+    const existingOrg = await User.findOne({ role: "organization" });
+    if (existingOrg) {
+      return res.status(200).json({
+        success: true,
+        message: "Organization account already exists!",
+        email: existingOrg.email
+      });
+    }
+
+    const org = await User.create({
+      name: "Main Organization",
+      email: "org@college.edu",
+      password: "orgpassword123",
+      role: "organization",
+    });
+
+    res.status(201).json({
+      success: true,
+      message: "🎉 Organization account successfully created!",
+      credentials: {
+        email: org.email,
+        password: "orgpassword123"
+      }
+    });
+  } catch (error) {
+    next(error);
+  }
+};
