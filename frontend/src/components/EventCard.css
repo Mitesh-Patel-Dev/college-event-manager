@@ -1,0 +1,130 @@
+.event-card {
+  background: var(--grad-card);
+  border: 1px solid var(--bg-surface0);
+  border-radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+  transition: var(--transition);
+  position: relative;
+  overflow: hidden;
+}
+
+.event-card-image {
+  width: 100%;
+  height: 140px;
+  overflow: hidden;
+  border-bottom: 1px solid var(--bg-surface0);
+}
+
+.event-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.event-card:hover .event-card-image img {
+  transform: scale(1.05);
+}
+
+.event-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--grad-primary);
+  opacity: 0;
+  transition: var(--transition);
+  z-index: 2;
+}
+
+.event-card:hover {
+  border-color: rgba(137, 180, 250, 0.25);
+  box-shadow: var(--shadow-glow);
+  transform: translateY(-4px);
+}
+
+.event-card:hover::before { opacity: 1; }
+
+.event-card-top {
+  padding: 1.2rem 1.4rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.event-card-title {
+  padding: 0.85rem 1.4rem 0;
+  font-family: var(--font-heading);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.event-card-meta {
+  padding: 0.85rem 1.4rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.event-card-meta span {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+.event-card-seats {
+  padding: 1.2rem 1.4rem 0;
+  margin-top: auto;
+}
+
+.seats-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.4rem;
+}
+
+.seats-label {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.seats-count {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--accent-green);
+}
+
+.seats-count.almost { color: var(--accent-yellow); }
+.seats-count.full { color: var(--accent-red); }
+
+.event-card-footer {
+  margin: 1.2rem 1.4rem 1.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--bg-surface0);
+}
+
+.event-organizer {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-style: italic;
+}

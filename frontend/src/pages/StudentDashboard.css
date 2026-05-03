@@ -1,0 +1,197 @@
+.student-dashboard { }
+
+/* ─── Profile Header ─────────────────────────────────────────── */
+.dashboard-header {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 2.5rem;
+  flex-wrap: wrap;
+  align-items: stretch;
+}
+
+.profile-card {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  background: var(--grad-card);
+  border: 1px solid var(--bg-surface0);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  flex: 1;
+  min-width: 280px;
+}
+
+.profile-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--grad-primary);
+  color: #11111b;
+  font-family: var(--font-heading);
+  font-size: 1.6rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.profile-name {
+  font-family: var(--font-heading);
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.15rem;
+}
+
+.profile-email {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
+}
+
+.profile-meta {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.profile-meta-item {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  background: var(--bg-surface0);
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius-full);
+}
+
+/* ─── Stats ──────────────────────────────────────────────────── */
+.dashboard-stats {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.dash-stat-card {
+  background: var(--grad-card);
+  border: 1px solid var(--bg-surface0);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem 1.75rem;
+  text-align: center;
+  min-width: 110px;
+  flex: 1;
+  transition: var(--transition);
+}
+
+.dash-stat-card:hover {
+  border-color: rgba(137, 180, 250, 0.25);
+}
+
+.dash-stat-num {
+  display: block;
+  font-family: var(--font-heading);
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--accent-blue);
+  line-height: 1.1;
+  margin-bottom: 0.25rem;
+}
+
+.dash-stat-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* ─── Sections ───────────────────────────────────────────────── */
+.dashboard-section { margin-bottom: 2.5rem; }
+
+.dash-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.dash-section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-heading);
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+/* ─── Registration Items ─────────────────────────────────────── */
+.reg-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.reg-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  background: var(--bg-crust);
+  border: 1px solid var(--bg-surface0);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem 1.5rem;
+  transition: var(--transition);
+  flex-wrap: wrap;
+}
+
+.reg-item:hover {
+  border-color: rgba(137, 180, 250, 0.2);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
+}
+
+.reg-item-info { flex: 1; min-width: 200px; }
+
+.reg-item-top {
+  display: flex;
+  gap: 0.4rem;
+  margin-bottom: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.reg-item-title {
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.reg-item-meta {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.reg-item-meta span {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.reg-item-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+@media (max-width: 600px) {
+  .reg-item { flex-direction: column; align-items: flex-start; }
+  .dashboard-stats { width: 100%; }
+}
