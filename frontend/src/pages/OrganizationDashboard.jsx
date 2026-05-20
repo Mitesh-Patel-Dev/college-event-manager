@@ -2,9 +2,13 @@ import { useEffect, useState, useMemo } from "react";
 import {
   FiPlus, FiCalendar, FiUsers, FiClock,
   FiTrendingUp, FiMapPin, FiAlertCircle,
-  FiX, FiEdit2, FiTrash2,
+  FiX, FiEdit2, FiTrash2, FiDollarSign, FiActivity,
 } from "react-icons/fi";
 import toast from "react-hot-toast";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
+} from "recharts";
 import useEventStore from "../store/eventStore";
 import "./OrganizationDashboard.css";
 
@@ -20,77 +24,6 @@ const EMPTY_FORM = {
   budget: "", approval_status: "pending",
 };
 
-// ─── Simple SVG Line Chart ─────────────────────────────────────
-function TrendChart({ data, period }) {
-  const width = 600;
-  const height = 180;
-  const padX = 40;
-  const padY = 25;
-
-  const filteredData = useMemo(() => {
-    if (!data || data.length === 0) return [];
-    const now = new Date();
-    const daysBack = period === "7d" ? 7 : period === "12m" ? 365 : 30;
-    const cutoff = new Date(now.getTime() - daysBack * 86400000);
-    return data.filter((d) => new Date(d._id) >= cutoff);
-  }, [data, period]);
-
-  if (filteredData.length === 0) {
-    return (
-      <div className="chart-empty">
-        <p>No registration data for this period</p>
-      </div>
-    );
-  }
-
-  const maxVal = Math.max(...filteredData.map((d) => d.count), 1);
-  const points = filteredData.map((d, i) => {
-    const x = padX + (i / Math.max(filteredData.length - 1, 1)) * (width - padX * 2);
-    const y = padY + (1 - d.count / maxVal) * (height - padY * 2);
-    return { x, y, count: d.count, date: d._id };
-  });
-
-  const linePath = points.map((p, i) => `${i === 0 ? "M" : "L"} ${p.x} ${p.y}`).join(" ");
-  const areaPath = `${linePath} L ${points[points.length - 1].x} ${height - padY} L ${points[0].x} ${height - padY} Z`;
-
-  // Y-axis labels
-  const yLabels = [0, Math.round(maxVal / 2), maxVal];
-
-  return (
-    <svg viewBox={`0 0 ${width} ${height}`} className="trend-chart-svg" preserveAspectRatio="none">
-      <defs>
-        <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#89b4fa" stopOpacity="0.3" />
-          <stop offset="100%" stopColor="#89b4fa" stopOpacity="0" />
-        </linearGradient>
-        <linearGradient id="lineGrad" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0%" stopColor="#89b4fa" />
-          <stop offset="100%" stopColor="#cba6f7" />
-        </linearGradient>
-      </defs>
-      {/* Grid lines */}
-      {yLabels.map((val) => {
-        const y = padY + (1 - val / maxVal) * (height - padY * 2);
-        return (
-          <g key={val}>
-            <line x1={padX} y1={y} x2={width - padX} y2={y} stroke="rgba(137,180,250,0.08)" strokeWidth="1" />
-            <text x={padX - 8} y={y + 4} fill="#7f849c" fontSize="10" textAnchor="end">{val}</text>
-          </g>
-        );
-      })}
-      {/* Area fill */}
-      <path d={areaPath} fill="url(#chartGrad)" />
-      {/* Line */}
-      <path d={linePath} fill="none" stroke="url(#lineGrad)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-      {/* Dots */}
-      {points.map((p, i) => (
-        <circle key={i} cx={p.x} cy={p.y} r="3" fill="#89b4fa" stroke="#11111b" strokeWidth="1.5" />
-      ))}
-    </svg>
-  );
-}
-
-// ─── Dashboard Component ────────────────────────────────────────
 export default function OrganizationDashboard() {
   const {
     events, fetchEvents, createEvent, updateEvent, deleteEvent,
@@ -109,6 +42,21 @@ export default function OrganizationDashboard() {
     fetchEvents();
     fetchEventStats();
   }, []);
+
+  // ─── Recharts Data Preparation ────────────────────────────────
+  const filteredChartData = useMemo(() => {
+    if (!trendData || trendData.length === 0) return [];
+    const now = new Date();
+    const daysBack = chartPeriod === "7d" ? 7 : chartPeriod === "12m" ? 365 : 30;
+    const cutoff = new Date(now.getTime() - daysBack * 86400000);
+    
+    return trendData
+      .filter((d) => new Date(d._id) >= cutoff)
+      .map(d => ({
+        date: new Date(d._id).toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+        registrations: d.count
+      }));
+  }, [trendData, chartPeriod]);
 
   // ─── Form Handlers ──────────────────────────────────────
   const openCreate = () => {
@@ -185,21 +133,44 @@ export default function OrganizationDashboard() {
   const approvalColor = (s) =>
     s === "approved" ? "green" : s === "rejected" ? "red" : "yellow";
 
+  // Calculate Revenue (Total budget of all events)
+  const totalRevenue = useMemo(() => {
+    return events.reduce((sum, e) => sum + (e.budget || 0), 0);
+  }, [events]);
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: { staggerChildren: 0.1 }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
+  };
+
   return (
-    <div className="org-dashboard">
+    <motion.div 
+      className="org-dashboard"
+      initial="hidden"
+      animate="show"
+      variants={containerVariants}
+    >
       {/* ─── Header ──────────────────────────────────────── */}
-      <div className="org-dash-header">
+      <motion.div className="org-dash-header" variants={itemVariants}>
         <div>
           <h1 className="org-dash-title">Dashboard</h1>
           <p className="org-dash-subtitle">Overview of your campus events</p>
         </div>
-        <button className="btn btn-primary" onClick={openCreate} id="create-event-btn">
+        <button className="btn btn-primary" onClick={openCreate}>
           <FiPlus /> Create Event
         </button>
-      </div>
+      </motion.div>
 
       {/* ─── Stats Cards ─────────────────────────────────── */}
-      <div className="org-stats-grid">
+      <motion.div className="org-stats-grid" variants={itemVariants}>
         {[
           {
             icon: FiCalendar, label: "Active Events",
@@ -212,17 +183,21 @@ export default function OrganizationDashboard() {
             trend: "+32%", color: "green",
           },
           {
+            icon: FiDollarSign, label: "Total Budget",
+            value: `₹${totalRevenue.toLocaleString()}`,
+            trend: "Across all events", color: "mauve",
+          },
+          {
             icon: FiAlertCircle, label: "Pending Approvals",
             value: stats?.pendingApprovals ?? 0,
             trend: "Needs action", color: "red", isAlert: true,
           },
-          {
-            icon: FiTrendingUp, label: "Total Capacity",
-            value: stats?.totalCapacity ?? 0,
-            trend: `${stats?.fillRate ?? 0}% filled`, color: "mauve",
-          },
         ].map((s) => (
-          <div className={`org-stat-card org-stat-${s.color}`} key={s.label}>
+          <motion.div 
+            className={`org-stat-card org-stat-${s.color} glass-card`} 
+            key={s.label}
+            whileHover={{ y: -5, boxShadow: "0 10px 30px -10px var(--accent-blue)" }}
+          >
             <div className="org-stat-top">
               <div className={`org-stat-icon-wrap org-stat-icon-${s.color}`}>
                 <s.icon size={18} />
@@ -231,16 +206,16 @@ export default function OrganizationDashboard() {
                 {s.trend}
               </span>
             </div>
-            <span className="org-stat-value">{s.value.toLocaleString()}</span>
+            <span className="org-stat-value">{s.value}</span>
             <span className="org-stat-label">{s.label}</span>
-          </div>
+          </motion.div>
         ))}
-      </div>
+      </motion.div>
 
       {/* ─── Main Content: Chart + Active Events ─────────── */}
-      <div className="org-dash-content">
+      <motion.div className="org-dash-content" variants={itemVariants}>
         {/* Chart Panel */}
-        <div className="org-chart-card">
+        <div className="org-chart-card glass-card">
           <div className="org-chart-header">
             <h2 className="org-chart-title">Registration Trend</h2>
             <div className="org-chart-periods">
@@ -255,15 +230,38 @@ export default function OrganizationDashboard() {
               ))}
             </div>
           </div>
-          <div className="org-chart-body">
-            <TrendChart data={trendData} period={chartPeriod} />
+          <div className="org-chart-body" style={{ height: "300px", width: "100%" }}>
+            {filteredChartData.length > 0 ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={filteredChartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="colorRegs" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#89b4fa" stopOpacity={0.8}/>
+                      <stop offset="95%" stopColor="#89b4fa" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+                  <XAxis dataKey="date" stroke="#a6adc8" fontSize={12} tickLine={false} axisLine={false} />
+                  <YAxis stroke="#a6adc8" fontSize={12} tickLine={false} axisLine={false} />
+                  <Tooltip 
+                    contentStyle={{ backgroundColor: "#1e1e2e", borderColor: "#313244", borderRadius: "8px" }}
+                    itemStyle={{ color: "#89b4fa" }}
+                  />
+                  <Area type="monotone" dataKey="registrations" stroke="#89b4fa" strokeWidth={3} fillOpacity={1} fill="url(#colorRegs)" />
+                </AreaChart>
+              </ResponsiveContainer>
+            ) : (
+               <div className="chart-empty">
+                 <p>No registration data for this period</p>
+               </div>
+            )}
           </div>
         </div>
 
         {/* Active Events Panel */}
-        <div className="org-active-card">
+        <div className="org-active-card glass-card">
           <div className="org-active-header">
-            <h2 className="org-active-title">Active Events</h2>
+            <h2 className="org-active-title">Recent Events</h2>
             <a href="/organization/events" className="org-view-all">View All</a>
           </div>
           <div className="org-active-list">
@@ -271,7 +269,11 @@ export default function OrganizationDashboard() {
               <p className="org-active-empty">No active events yet</p>
             ) : (
               activeEventsList.map((evt) => (
-                <div className="org-active-item" key={evt._id}>
+                <motion.div 
+                  className="org-active-item" 
+                  key={evt._id}
+                  whileHover={{ x: 5, backgroundColor: "rgba(255,255,255,0.05)" }}
+                >
                   <div className={`org-active-dot dot-${approvalColor(evt.approval_status)}`} />
                   <div className="org-active-info">
                     <span className="org-active-name">{evt.title}</span>
@@ -284,160 +286,121 @@ export default function OrganizationDashboard() {
                   <span className={`badge badge-${approvalColor(evt.approval_status)}`}>
                     {evt.approval_status?.toUpperCase()}
                   </span>
-                </div>
+                </motion.div>
               ))
             )}
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {/* ─── Create/Edit Modal ────────────────────────────── */}
-      {showModal && (
-        <div className="modal-overlay" onClick={() => setShowModal(false)}>
-          <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h2 className="modal-title">
-                {editingEvent ? "Edit Event" : "Create New Event"}
-              </h2>
-              <button className="modal-close" onClick={() => setShowModal(false)} id="modal-close-btn">
-                <FiX />
-              </button>
-            </div>
-
-            <form onSubmit={handleSubmit}>
-              <div className="form-group">
-                <label className="form-label">Event Title *</label>
-                <input name="title" className="form-control"
-                  placeholder="e.g. React.js Workshop 2025"
-                  value={form.title} onChange={handleChange} required
-                  id="event-title-input" />
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">Description *</label>
-                <textarea name="description" className="form-control"
-                  placeholder="Describe the event..."
-                  value={form.description} onChange={handleChange}
-                  rows={3} required id="event-desc-input"
-                  style={{ resize: "vertical" }} />
-              </div>
-
-              <div className="modal-grid-2">
-                <div className="form-group">
-                  <label className="form-label">Category *</label>
-                  <select name="category" className="form-control"
-                    value={form.category} onChange={handleChange} id="event-cat-select">
-                    {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
-                  </select>
-                </div>
-                <div className="form-group">
-                  <label className="form-label">Status</label>
-                  <select name="status" className="form-control"
-                    value={form.status} onChange={handleChange} id="event-status-select">
-                    {STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
-                  </select>
-                </div>
-                <div className="form-group">
-                  <label className="form-label">Date *</label>
-                  <input type="date" name="date" className="form-control"
-                    value={form.date} onChange={handleChange} required id="event-date-input" />
-                </div>
-                <div className="form-group">
-                  <label className="form-label">Time *</label>
-                  <input type="text" name="time" className="form-control"
-                    placeholder="e.g. 10:00 AM - 1:00 PM"
-                    value={form.time} onChange={handleChange} required id="event-time-input" />
-                </div>
-                <div className="form-group">
-                  <label className="form-label">Venue *</label>
-                  <input type="text" name="venue" className="form-control"
-                    placeholder="e.g. Seminar Hall A"
-                    value={form.venue} onChange={handleChange} required id="event-venue-input" />
-                </div>
-                <div className="form-group">
-                  <label className="form-label">Max Capacity *</label>
-                  <input type="number" name="max_capacity" className="form-control"
-                    placeholder="e.g. 100"
-                    value={form.max_capacity} onChange={handleChange}
-                    required min={1} id="event-capacity-input" />
-                </div>
-                <div className="form-group">
-                  <label className="form-label">Budget (₹)</label>
-                  <input type="number" name="budget" className="form-control"
-                    placeholder="e.g. 5000"
-                    value={form.budget} onChange={handleChange}
-                    min={0} id="event-budget-input" />
-                </div>
-                <div className="form-group">
-                  <label className="form-label">Organizer</label>
-                  <input type="text" name="organizer" className="form-control"
-                    placeholder="e.g. Computer Science Dept."
-                    value={form.organizer} onChange={handleChange} id="event-organizer-input" />
-                </div>
-              </div>
-
-              <div className="modal-footer">
-                <button type="button" className="btn btn-ghost"
-                  onClick={() => setShowModal(false)}>Cancel</button>
-                <button type="submit" className="btn btn-primary"
-                  disabled={submitting} id="event-submit-btn">
-                  {submitting ? <span className="spinner spinner-sm" /> : null}
-                  {editingEvent ? "Update Event" : "Create Event"}
+      <AnimatePresence>
+        {showModal && (
+          <motion.div 
+            className="modal-overlay" 
+            onClick={() => setShowModal(false)}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div 
+              className="modal glass-modal" 
+              onClick={(e) => e.stopPropagation()}
+              initial={{ scale: 0.95, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 20 }}
+            >
+              <div className="modal-header">
+                <h2 className="modal-title">
+                  {editingEvent ? "Edit Event" : "Create New Event"}
+                </h2>
+                <button className="modal-close" onClick={() => setShowModal(false)}>
+                  <FiX />
                 </button>
               </div>
-            </form>
-          </div>
-        </div>
-      )}
 
-      {/* ─── Registrations Viewer Modal ───────────────────── */}
-      {viewingRegs && (
-        <div className="modal-overlay" onClick={() => setViewingRegs(null)}>
-          <div className="modal modal-lg" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <div>
-                <h2 className="modal-title">Applications</h2>
-                <p style={{ fontSize: "0.82rem", color: "var(--text-muted)" }}>
-                  {viewingRegs.event.title}
-                </p>
-              </div>
-              <button className="modal-close" onClick={() => setViewingRegs(null)}>
-                <FiX />
-              </button>
-            </div>
+              <form onSubmit={handleSubmit}>
+                <div className="form-group">
+                  <label className="form-label">Event Title *</label>
+                  <input name="title" className="form-control"
+                    placeholder="e.g. React.js Workshop 2026"
+                    value={form.title} onChange={handleChange} required />
+                </div>
 
-            <p className="regs-count">
-              {viewingRegs.registrations.length} student
-              {viewingRegs.registrations.length !== 1 ? "s" : ""} applied
-            </p>
+                <div className="form-group">
+                  <label className="form-label">Description *</label>
+                  <textarea name="description" className="form-control"
+                    placeholder="Describe the event..."
+                    value={form.description} onChange={handleChange}
+                    rows={3} required style={{ resize: "vertical" }} />
+                </div>
 
-            {viewingRegs.registrations.length === 0 ? (
-              <p style={{ textAlign: "center", color: "var(--text-muted)", padding: "2rem" }}>
-                No students have applied yet.
-              </p>
-            ) : (
-              <div className="regs-list">
-                {viewingRegs.registrations.map((r, i) => (
-                  <div className="reg-row" key={r._id}>
-                    <span className="reg-row-num">{i + 1}</span>
-                    <div className="reg-row-avatar">
-                      {r.student?.name?.charAt(0).toUpperCase()}
-                    </div>
-                    <div className="reg-row-info">
-                      <span className="reg-row-name">{r.student?.name}</span>
-                      <span className="reg-row-meta">
-                        {r.student?.email}
-                        {r.student?.rollNumber && ` · ${r.student.rollNumber}`}
-                        {r.student?.department && ` · ${r.student.department}`}
-                      </span>
-                    </div>
+                <div className="modal-grid-2">
+                  <div className="form-group">
+                    <label className="form-label">Category *</label>
+                    <select name="category" className="form-control"
+                      value={form.category} onChange={handleChange}>
+                      {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
+                    </select>
                   </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-    </div>
+                  <div className="form-group">
+                    <label className="form-label">Status</label>
+                    <select name="status" className="form-control"
+                      value={form.status} onChange={handleChange}>
+                      {STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
+                    </select>
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label">Date *</label>
+                    <input type="date" name="date" className="form-control"
+                      value={form.date} onChange={handleChange} required />
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label">Time *</label>
+                    <input type="text" name="time" className="form-control"
+                      placeholder="e.g. 10:00 AM - 1:00 PM"
+                      value={form.time} onChange={handleChange} required />
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label">Venue *</label>
+                    <input type="text" name="venue" className="form-control"
+                      placeholder="e.g. Seminar Hall A"
+                      value={form.venue} onChange={handleChange} required />
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label">Max Capacity *</label>
+                    <input type="number" name="max_capacity" className="form-control"
+                      placeholder="e.g. 100"
+                      value={form.max_capacity} onChange={handleChange}
+                      required min={1} />
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label">Budget (₹)</label>
+                    <input type="number" name="budget" className="form-control"
+                      placeholder="e.g. 5000"
+                      value={form.budget} onChange={handleChange} min={0} />
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label">Organizer</label>
+                    <input type="text" name="organizer" className="form-control"
+                      placeholder="e.g. Computer Science Dept."
+                      value={form.organizer} onChange={handleChange} />
+                  </div>
+                </div>
+
+                <div className="modal-footer">
+                  <button type="button" className="btn btn-ghost"
+                    onClick={() => setShowModal(false)}>Cancel</button>
+                  <button type="submit" className="btn btn-primary" disabled={submitting}>
+                    {submitting ? <span className="spinner spinner-sm" /> : null}
+                    {editingEvent ? "Update Event" : "Create Event"}
+                  </button>
+                </div>
+              </form>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
   );
 }

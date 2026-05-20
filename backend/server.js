@@ -10,6 +10,9 @@ import errorHandler from "./middleware/errorHandler.js";
 import authRoutes from "./routes/authRoutes.js";
 import eventRoutes from "./routes/eventRoutes.js";
 import registrationRoutes from "./routes/registrationRoutes.js";
+import notificationRoutes from "./routes/notificationRoutes.js";
+import feedbackRoutes from "./routes/feedbackRoutes.js";
+import certificateRoutes from "./routes/certificateRoutes.js";
 
 // ─── ES Module __dirname workaround ───────────────────────────────
 const __filename = fileURLToPath(import.meta.url);
@@ -45,6 +48,9 @@ app.get("/api/health", (req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/events", eventRoutes);
 app.use("/api/registrations", registrationRoutes);
+app.use("/api/notifications", notificationRoutes);
+app.use("/api/feedback", feedbackRoutes);
+app.use("/api/certificates", certificateRoutes);
 
 // ─── Serve Frontend in Production ──────────────────────────────────
 if (process.env.NODE_ENV === "production") {

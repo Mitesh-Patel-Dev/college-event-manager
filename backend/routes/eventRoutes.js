@@ -8,6 +8,9 @@ import {
   getEventRegistrations,
   getEventStats,
   updateApprovalStatus,
+  toggleSaveEvent,
+  getSavedEvents,
+  getRecommendedEvents,
 } from "../controllers/eventController.js";
 import { protect, authorizeRoles } from "../middleware/authMiddleware.js";
 
@@ -15,6 +18,10 @@ const router = express.Router();
 
 // Public routes
 router.get("/", getAllEvents);
+
+// Student: Saved and Recommended Events (must come BEFORE /:id)
+router.get("/saved", protect, getSavedEvents);
+router.get("/recommended", protect, getRecommendedEvents);
 
 // Organization: Dashboard stats (must come BEFORE /:id to avoid conflict)
 router.get("/stats", protect, authorizeRoles("organization"), getEventStats);
@@ -41,5 +48,8 @@ router.get(
   authorizeRoles("organization"),
   getEventRegistrations
 );
+
+// Student: Toggle save event
+router.post("/:id/save", protect, toggleSaveEvent);
 
 export default router;

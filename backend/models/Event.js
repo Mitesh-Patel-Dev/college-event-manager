@@ -67,6 +67,24 @@ const eventSchema = new mongoose.Schema(
       min: [1, "Capacity must be at least 1"],
     },
 
+    registrationDeadline: {
+      type: Date,
+    },
+
+    contactEmail: {
+      type: String,
+      trim: true,
+      match: [
+        /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
+        "Please add a valid email",
+      ],
+    },
+
+    tags: {
+      type: [String],
+      default: [],
+    },
+
     // Atomically incremented/decremented — never set manually
     current_count: {
       type: Number,
@@ -126,6 +144,14 @@ eventSchema.virtual("seatsAvailable").get(function () {
 // ─── Index for faster queries ──────────────────────────────────────
 eventSchema.index({ date: 1, status: 1 });
 eventSchema.index({ category: 1 });
+
+// ─── Indexes for Smart Search ──────────────────────────────────────────
+eventSchema.index({
+  title: "text",
+  description: "text",
+  category: "text",
+  venue: "text",
+});
 
 const Event = mongoose.model("Event", eventSchema);
 export default Event;

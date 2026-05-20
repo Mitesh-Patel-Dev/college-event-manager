@@ -53,6 +53,24 @@ const userSchema = new mongoose.Schema(
       trim: true,
       default: "",
     },
+
+    avatar: {
+      type: String,
+      default: "",
+    },
+
+    phone: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+
+    savedEvents: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Event",
+      },
+    ],
   },
   {
     timestamps: true, // Adds createdAt and updatedAt automatically

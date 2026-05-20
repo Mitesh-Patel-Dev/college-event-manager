@@ -1,15 +1,19 @@
 import { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { FiMenu, FiX, FiCalendar, FiLogOut, FiUser, FiGrid } from "react-icons/fi";
+import { FiMenu, FiX, FiCalendar, FiLogOut, FiUser, FiGrid, FiBell } from "react-icons/fi";
 import useAuthStore from "../store/authStore";
+import useNotificationStore from "../store/notificationStore";
+import NotificationPanel from "./NotificationPanel";
 import toast from "react-hot-toast";
 import "./Navbar.css";
 
 export default function Navbar() {
   const { user, token, logout } = useAuthStore();
+  const { unreadCount } = useNotificationStore();
   const navigate = useNavigate();
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
 
   const handleLogout = () => {
     logout();
@@ -53,6 +57,21 @@ export default function Navbar() {
         <div className="navbar-actions">
           {token ? (
             <div className="navbar-user">
+              {user && (
+                <div style={{ position: "relative" }}>
+                  <button 
+                    className="nav-btn nav-btn-icon"
+                    onClick={() => setShowNotifications(!showNotifications)}
+                  >
+                    <FiBell size={20} />
+                    {unreadCount > 0 && <span className="nav-badge">{unreadCount}</span>}
+                  </button>
+                  <NotificationPanel 
+                    isOpen={showNotifications} 
+                    onClose={() => setShowNotifications(false)} 
+                  />
+                </div>
+              )}
               <div className="user-chip">
                 <div className="user-avatar">
                   {user?.name?.charAt(0).toUpperCase()}

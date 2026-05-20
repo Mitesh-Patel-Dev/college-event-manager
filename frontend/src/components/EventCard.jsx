@@ -1,103 +1,103 @@
 import { Link } from "react-router-dom";
-import { FiCalendar, FiMapPin, FiUsers, FiClock } from "react-icons/fi";
+import { FiCalendar, FiMapPin, FiUsers, FiClock, FiBookmark } from "react-icons/fi";
+import useAuthStore from "../store/authStore";
+import useEventStore from "../store/eventStore";
+import toast from "react-hot-toast";
+import { motion } from "framer-motion";
 import "./EventCard.css";
 
-/**
- * Reusable Event Card Component.
- * Displays a preview of an event with seat availability indicator.
- */
-const CATEGORY_COLORS = {
-  Workshop: "blue",
-  Seminar: "mauve",
-  Cultural: "peach",
-  Sports: "green",
-  Technical: "sky",
-  "Guest Lecture": "yellow",
-  Hackathon: "red",
-  Other: "blue",
-};
-
 export default function EventCard({ event }) {
-  const {
-    _id,
-    title,
-    category,
-    date,
-    time,
-    venue,
-    max_capacity,
-    current_count,
-    status,
-    organizer,
-  } = event;
+  const { user } = useAuthStore();
+  const { savedEvents, toggleSaveEvent, fetchSavedEvents } = useEventStore();
 
-  const seatsAvailable = max_capacity - current_count;
-  const fillPct = (current_count / max_capacity) * 100;
-  const isFull = seatsAvailable <= 0;
-  const isAlmostFull = fillPct >= 75 && !isFull;
+  const isSaved = savedEvents.some(e => e._id === event._id);
 
-  // Determine bar color based on fill percentage
-  const barColor = isFull ? "red" : isAlmostFull ? "yellow" : "green";
-  const badgeColor = CATEGORY_COLORS[category] || "blue";
+  const handleToggleSave = async (e) => {
+    e.preventDefault();
+    if (!user) {
+      toast.error("Please login to save events");
+      return;
+    }
+    try {
+      await toggleSaveEvent(event._id);
+      fetchSavedEvents();
+    } catch (error) {
+      toast.error("Failed to save event");
+    }
+  };
 
-  const formatDate = (d) =>
-    new Date(d).toLocaleDateString("en-IN", {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-    });
+  const formatDate = (dateString) => {
+    const options = { year: "numeric", month: "short", day: "numeric" };
+    return new Date(dateString).toLocaleDateString("en-IN", options);
+  };
+
+  // Popularity Prediction Logic (Trending Badge)
+  const isTrending = event.max_capacity > 0 && (event.current_count / event.max_capacity) > 0.7;
 
   return (
-    <div className="event-card animate-fade-in-up">
-      {/* Image Banner */}
-      <div className="event-card-image">
-        <img src="/event-placeholder.png" alt={title} />
-      </div>
-
-      {/* Category & Status */}
-      <div className="event-card-top">
-        <span className={`badge badge-${badgeColor}`}>{category}</span>
-        {status === "cancelled" && <span className="badge badge-red">Cancelled</span>}
-        {isFull && status !== "cancelled" && <span className="badge badge-red">Full</span>}
-        {isAlmostFull && <span className="badge badge-yellow">Almost Full</span>}
-      </div>
-
-      {/* Title */}
-      <h3 className="event-card-title">{title}</h3>
-
-      {/* Meta Info */}
-      <div className="event-card-meta">
-        <span><FiCalendar size={13} /> {formatDate(date)}</span>
-        <span><FiClock size={13} /> {time}</span>
-        <span><FiMapPin size={13} /> {venue}</span>
-      </div>
-
-      {/* Seat Availability */}
-      <div className="event-card-seats">
-        <div className="seats-header">
-          <span className="seats-label">
-            <FiUsers size={13} />
-            Seats Available
-          </span>
-          <span className={`seats-count ${isFull ? "full" : isAlmostFull ? "almost" : ""}`}>
-            {isFull ? "Full" : `${seatsAvailable} / ${max_capacity}`}
-          </span>
+    <motion.div 
+      className="event-card glass-card glow-hover"
+      whileHover={{ y: -5 }}
+    >
+      {/* Optional Image */}
+      {event.image && (
+        <div className="event-card-image">
+          <img src={event.image} alt={event.title} />
         </div>
-        <div className="seat-bar">
-          <div
-            className={`seat-bar-fill ${barColor}`}
-            style={{ width: `${Math.min(fillPct, 100)}%` }}
-          />
+      )}
+
+      <div className="event-card-content">
+        <div className="event-card-header">
+          <div style={{ display: "flex", gap: "0.5rem" }}>
+            <span className="badge badge-blue">{event.category}</span>
+            {isTrending && <span className="badge badge-red">🔥 Trending</span>}
+          </div>
+          
+          <button 
+            className={`save-btn ${isSaved ? "active" : ""}`} 
+            onClick={handleToggleSave}
+            title={isSaved ? "Unsave Event" : "Save Event"}
+          >
+            <FiBookmark fill={isSaved ? "currentColor" : "none"} size={18} />
+          </button>
+        </div>
+
+        <h3 className="event-card-title">{event.title}</h3>
+        <p className="event-card-desc">{event.description}</p>
+
+        <div className="event-card-details">
+          <div className="event-detail">
+            <FiCalendar className="event-icon" />
+            <span>{formatDate(event.date)}</span>
+          </div>
+          <div className="event-detail">
+            <FiClock className="event-icon" />
+            <span>{event.time}</span>
+          </div>
+          <div className="event-detail">
+            <FiMapPin className="event-icon" />
+            <span>{event.venue}</span>
+          </div>
+          <div className="event-detail">
+            <FiUsers className="event-icon" />
+            <span>
+              {event.current_count} / {event.max_capacity} Seats
+            </span>
+          </div>
         </div>
       </div>
 
-      {/* Footer */}
       <div className="event-card-footer">
-        <span className="event-organizer">by {organizer}</span>
-        <Link to={`/events/${_id}`} className="btn btn-primary btn-sm" id={`view-event-${_id}`}>
+        <div className="event-organizer">
+          By <span>{event.organizer}</span>
+        </div>
+        <Link to={`/events/${event._id}`} className="btn btn-primary btn-sm">
           View Details
         </Link>
       </div>
-    </div>
+      
+      {/* Category accent bar */}
+      <div className="event-card-accent"></div>
+    </motion.div>
   );
 }

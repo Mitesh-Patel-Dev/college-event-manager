@@ -1,0 +1,227 @@
+.qr-ticket {
+  display: flex;
+  position: relative;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  margin-bottom: 1rem;
+  background: linear-gradient(135deg, rgba(30, 30, 46, 0.8) 0%, rgba(24, 24, 37, 0.9) 100%);
+  border: 1px solid rgba(137, 180, 250, 0.15);
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.qr-ticket:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 15px 35px -10px rgba(137, 180, 250, 0.2);
+  border-color: rgba(137, 180, 250, 0.3);
+}
+
+.qr-ticket-left {
+  flex: 1;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.qr-ticket-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.qr-ticket-id {
+  font-family: monospace;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  letter-spacing: 1px;
+}
+
+.qr-ticket-title {
+  font-family: var(--font-heading);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 1rem 0;
+  line-height: 1.3;
+}
+
+.qr-ticket-details {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.qr-ticket-detail {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.qr-icon {
+  color: var(--accent-blue);
+}
+
+.qr-ticket-user {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.qr-user-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--bg-surface0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+}
+
+.qr-user-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.qr-user-name {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.qr-user-roll {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* ─── Ticket Divider ─────────────────────────────────────────── */
+.qr-ticket-divider {
+  position: relative;
+  width: 2px;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.qr-dash-line {
+  position: absolute;
+  top: 10px;
+  bottom: 10px;
+  left: 0;
+  width: 1px;
+  border-left: 2px dashed rgba(255, 255, 255, 0.1);
+}
+
+.qr-notch {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background: var(--bg-base);
+  border-radius: 50%;
+  left: -10px;
+  border: 1px solid rgba(137, 180, 250, 0.15);
+  z-index: 10;
+}
+
+.qr-notch.top {
+  top: -10px;
+  border-bottom-color: transparent;
+  border-left-color: transparent;
+  transform: rotate(-45deg);
+}
+
+.qr-notch.bottom {
+  bottom: -10px;
+  border-top-color: transparent;
+  border-right-color: transparent;
+  transform: rotate(-45deg);
+}
+
+/* ─── Ticket Right (QR) ──────────────────────────────────────── */
+.qr-ticket-right {
+  width: 180px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(17, 17, 27, 0.4);
+}
+
+.qr-code-wrapper {
+  background: white;
+  padding: 0.5rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  margin-bottom: 0.75rem;
+}
+
+.qr-scan-text {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--accent-blue);
+  letter-spacing: 1.5px;
+  text-align: center;
+}
+
+/* ─── Responsive ─────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .qr-ticket {
+    flex-direction: column;
+  }
+  
+  .qr-ticket-details {
+    grid-template-columns: 1fr;
+  }
+
+  .qr-ticket-divider {
+    width: 100%;
+    height: 2px;
+  }
+
+  .qr-dash-line {
+    top: 0;
+    bottom: auto;
+    left: 10px;
+    right: 10px;
+    height: 1px;
+    width: auto;
+    border-left: none;
+    border-top: 2px dashed rgba(255, 255, 255, 0.1);
+  }
+
+  .qr-notch.top {
+    left: -10px;
+    top: -10px;
+    border-right-color: transparent;
+    transform: rotate(45deg);
+  }
+
+  .qr-notch.bottom {
+    right: -10px;
+    left: auto;
+    bottom: auto;
+    top: -10px;
+    border-left-color: transparent;
+    transform: rotate(45deg);
+  }
+
+  .qr-ticket-right {
+    width: 100%;
+    padding: 1.5rem;
+    flex-direction: row;
+    gap: 1.5rem;
+  }
+
+  .qr-code-wrapper {
+    margin-bottom: 0;
+  }
+}

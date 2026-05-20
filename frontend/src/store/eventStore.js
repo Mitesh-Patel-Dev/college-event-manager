@@ -13,6 +13,8 @@ const useEventStore = create((set, get) => ({
   stats: null,
   trendData: [],
   activeEventsList: [],
+  savedEvents: [],
+  recommendedEvents: [],
   isLoading: false,
   error: null,
 
@@ -158,6 +160,44 @@ const useEventStore = create((set, get) => ({
       throw new Error(
         error.response?.data?.message || "Failed to fetch registrations"
       );
+    }
+  },
+
+  toggleSaveEvent: async (id) => {
+    try {
+      const { data } = await API.post(`/events/${id}/save`);
+      return data;
+    } catch (error) {
+      throw new Error(error.response?.data?.message || "Failed to save event");
+    }
+  },
+
+  fetchSavedEvents: async () => {
+    set({ isLoading: true, error: null });
+    try {
+      const { data } = await API.get("/events/saved");
+      set({ savedEvents: data.events, isLoading: false });
+    } catch (error) {
+      set({ error: error.response?.data?.message || "Failed to fetch saved events", isLoading: false });
+    }
+  },
+
+  fetchRecommendedEvents: async () => {
+    set({ isLoading: true, error: null });
+    try {
+      const { data } = await API.get("/events/recommended");
+      set({ recommendedEvents: data.events, isLoading: false });
+    } catch (error) {
+      set({ error: error.response?.data?.message || "Failed to fetch recommendations", isLoading: false });
+    }
+  },
+
+  submitFeedback: async (eventId, rating, comment) => {
+    try {
+      const { data } = await API.post("/feedback", { eventId, rating, comment });
+      return data;
+    } catch (error) {
+      throw new Error(error.response?.data?.message || "Failed to submit feedback");
     }
   },
 

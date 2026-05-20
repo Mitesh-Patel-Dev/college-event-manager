@@ -289,3 +289,101 @@ export const updateApprovalStatus = async (req, res, next) => {
   }
 };
 
+// ─────────────────────────────────────────────────────────────────────
+// @desc    Toggle save/unsave an event for a student
+// @route   POST /api/events/:id/save
+// @access  Private (Student)
+// ─────────────────────────────────────────────────────────────────────
+export const toggleSaveEvent = async (req, res, next) => {
+  try {
+    const user = await req.user.model("User").findById(req.user._id);
+    const eventId = req.params.id;
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    const isSaved = user.savedEvents.includes(eventId);
+
+    if (isSaved) {
+      user.savedEvents = user.savedEvents.filter((id) => id.toString() !== eventId);
+    } else {
+      user.savedEvents.push(eventId);
+    }
+
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: isSaved ? "Event unsaved" : "Event saved",
+      savedEvents: user.savedEvents,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// ─────────────────────────────────────────────────────────────────────
+// @desc    Get user's saved events
+// @route   GET /api/events/saved
+// @access  Private (Student)
+// ─────────────────────────────────────────────────────────────────────
+export const getSavedEvents = async (req, res, next) => {
+  try {
+    const user = await req.user.model("User").findById(req.user._id).populate("savedEvents");
+    
+    res.status(200).json({
+      success: true,
+      count: user.savedEvents.length,
+      events: user.savedEvents,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// ─────────────────────────────────────────────────────────────────────
+// @desc    Get recommended events for a user based on their history
+// @route   GET /api/events/recommended
+// @access  Private (Student)
+// ─────────────────────────────────────────────────────────────────────
+export const getRecommendedEvents = async (req, res, next) => {
+  try {
+    const userId = req.user._id;
+
+    // 1. Get user's past registrations to find their favorite categories
+    const registrations = await req.user.model("Registration").find({ student: userId }).populate("event");
+    const userCategories = new Set();
+    const registeredEventIds = new Set();
+
+    registrations.forEach((reg) => {
+      if (reg.event && reg.event.category) {
+        userCategories.add(reg.event.category);
+        registeredEventIds.add(reg.event._id.toString());
+      }
+    });
+
+    // 2. Find upcoming approved events in those categories that the user hasn't registered for
+    const query = {
+      status: "upcoming",
+      approval_status: "approved",
+      _id: { $nin: Array.from(registeredEventIds) },
+    };
+
+    if (userCategories.size > 0) {
+      query.category = { $in: Array.from(userCategories) };
+    }
+
+    const recommendedEvents = await req.user.model("Event").find(query)
+      .sort({ date: 1 })
+      .limit(6);
+
+    res.status(200).json({
+      success: true,
+      events: recommendedEvents,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
