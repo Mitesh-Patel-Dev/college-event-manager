@@ -473,3 +473,24 @@ tbody tr:hover {
 
   .section-title { font-size: 1.4rem; }
 }
+
+/* ─── Organization Sidebar Layout ────────────────────────────── */
+.org-layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+.org-main-content {
+  flex: 1;
+  margin-left: 260px;
+  min-height: 100vh;
+  background: var(--bg-base);
+  transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@media (max-width: 768px) {
+  .org-main-content {
+    margin-left: 68px;
+  }
+}
+

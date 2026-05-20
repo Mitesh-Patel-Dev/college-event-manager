@@ -1,0 +1,229 @@
+/* ============================================================
+   Organization Events Page — CampusFlow Card Grid
+   ============================================================ */
+
+.org-events-page {
+  padding: 2rem;
+  animation: fadeInUp 0.5s ease both;
+}
+
+/* ─── Header ─────────────────────────────────────────────────── */
+.org-events-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.org-events-title {
+  font-family: var(--font-heading);
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.org-events-subtitle {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin-top: 0.25rem;
+}
+
+.org-events-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.org-search-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.org-search-icon {
+  position: absolute;
+  left: 0.85rem;
+  color: var(--text-muted);
+  pointer-events: none;
+  font-size: 0.85rem;
+}
+
+.org-search-input {
+  padding: 0.6rem 1rem 0.6rem 2.25rem;
+  background: var(--bg-mantle);
+  border: 1px solid var(--bg-surface0);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  width: 220px;
+  transition: var(--transition);
+}
+
+.org-search-input:focus {
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 3px rgba(137, 180, 250, 0.1);
+  width: 260px;
+}
+
+.org-search-input::placeholder { color: var(--text-muted); }
+
+/* ─── Tabs ───────────────────────────────────────────────────── */
+.org-tabs {
+  display: flex;
+  gap: 0.25rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid var(--bg-surface0);
+  padding-bottom: 0;
+}
+
+.org-tab {
+  padding: 0.65rem 1.25rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  transition: var(--transition);
+  margin-bottom: -1px;
+}
+
+.org-tab:hover { color: var(--text-primary); }
+
+.org-tab.active {
+  color: var(--accent-blue);
+  border-bottom-color: var(--accent-blue);
+}
+
+/* ─── Cards Grid ─────────────────────────────────────────────── */
+.org-events-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+}
+
+/* ─── Event Card ─────────────────────────────────────────────── */
+.org-event-card {
+  background: var(--bg-crust);
+  border: 1px solid var(--bg-surface0);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  transition: var(--transition);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.org-event-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(137, 180, 250, 0.2);
+  box-shadow: var(--shadow-glow);
+}
+
+.org-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.org-card-organizer {
+  font-size: 0.72rem;
+  color: var(--accent-blue);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.org-card-title {
+  font-family: var(--font-heading);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.3;
+}
+
+.org-card-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.org-card-meta span {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.org-card-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(137, 180, 250, 0.06);
+}
+
+.org-card-reg {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+
+.org-card-reg-count {
+  font-weight: 600;
+}
+
+.org-card-live {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--accent-green);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.org-card-actions {
+  display: flex;
+  gap: 0.3rem;
+}
+
+.icon-btn.green { background: rgba(166,227,161,0.12); color: var(--accent-green); }
+.icon-btn.green:hover { background: rgba(166,227,161,0.25); }
+
+/* Bottom accent bar */
+.org-card-accent {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+}
+
+.accent-green { background: var(--accent-green); }
+.accent-yellow { background: var(--accent-yellow); }
+.accent-red { background: var(--accent-red); }
+
+/* ─── Responsive ─────────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .org-events-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 768px) {
+  .org-events-page { padding: 1rem; }
+  .org-events-grid { grid-template-columns: 1fr; }
+  .org-events-header { flex-direction: column; }
+  .org-events-header-actions { flex-direction: column; width: 100%; }
+  .org-search-input { width: 100%; }
+  .org-search-input:focus { width: 100%; }
+}

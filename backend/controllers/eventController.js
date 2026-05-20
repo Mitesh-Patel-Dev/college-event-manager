@@ -180,3 +180,112 @@ export const getEventRegistrations = async (req, res, next) => {
     next(error);
   }
 };
+
+// ─────────────────────────────────────────────────────────────────────
+// @desc    Get aggregate stats for the Organization dashboard
+// @route   GET /api/events/stats
+// @access  Private/Organization
+// ─────────────────────────────────────────────────────────────────────
+export const getEventStats = async (req, res, next) => {
+  try {
+    const events = await Event.find().sort({ date: 1 });
+
+    const activeEvents = events.filter(
+      (e) => e.status === "upcoming" || e.status === "ongoing"
+    );
+    const totalApplicants = events.reduce((s, e) => s + e.current_count, 0);
+    const pendingApprovals = events.filter(
+      (e) => e.approval_status === "pending"
+    ).length;
+    const totalCapacity = events.reduce((s, e) => s + e.max_capacity, 0);
+
+    // Registration trend: count registrations per day over the last 30 days
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+    const trendData = await Registration.aggregate([
+      {
+        $match: {
+          registeredAt: { $gte: thirtyDaysAgo },
+          status: "confirmed",
+        },
+      },
+      {
+        $group: {
+          _id: {
+            $dateToString: { format: "%Y-%m-%d", date: "$registeredAt" },
+          },
+          count: { $sum: 1 },
+        },
+      },
+      { $sort: { _id: 1 } },
+    ]);
+
+    // Active events list for sidebar
+    const activeEventsList = activeEvents.slice(0, 8).map((e) => ({
+      _id: e._id,
+      title: e.title,
+      date: e.date,
+      venue: e.venue,
+      approval_status: e.approval_status,
+    }));
+
+    res.status(200).json({
+      success: true,
+      stats: {
+        activeEvents: activeEvents.length,
+        totalApplicants,
+        pendingApprovals,
+        totalCapacity,
+        fillRate:
+          totalCapacity > 0
+            ? Math.round((totalApplicants / totalCapacity) * 100)
+            : 0,
+      },
+      trendData,
+      activeEventsList,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// ─────────────────────────────────────────────────────────────────────
+// @desc    Update event approval status
+// @route   PATCH /api/events/:id/approval
+// @access  Private/Organization
+// ─────────────────────────────────────────────────────────────────────
+export const updateApprovalStatus = async (req, res, next) => {
+  try {
+    const { approval_status } = req.body;
+
+    if (!["pending", "approved", "rejected"].includes(approval_status)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid approval status. Must be: pending, approved, or rejected",
+      });
+    }
+
+    const event = await Event.findByIdAndUpdate(
+      req.params.id,
+      { approval_status },
+      { new: true, runValidators: true }
+    );
+
+    if (!event) {
+      return res.status(404).json({
+        success: false,
+        message: "Event not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: `Event ${approval_status} successfully`,
+      event,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+

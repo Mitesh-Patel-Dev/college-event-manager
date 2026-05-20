@@ -80,6 +80,12 @@ const eventSchema = new mongoose.Schema(
       default: "College Administration",
     },
 
+    budget: {
+      type: Number,
+      default: 0,
+      min: [0, "Budget cannot be negative"],
+    },
+
     image: {
       type: String,
       default: "",
@@ -89,6 +95,12 @@ const eventSchema = new mongoose.Schema(
       type: String,
       enum: ["upcoming", "ongoing", "completed", "cancelled"],
       default: "upcoming",
+    },
+
+    approval_status: {
+      type: String,
+      enum: ["pending", "approved", "rejected"],
+      default: "pending",
     },
 
     // Reference to the admin who created this event

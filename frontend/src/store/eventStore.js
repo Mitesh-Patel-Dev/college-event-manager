@@ -1,7 +1,7 @@
 /**
  * Event Store — Zustand
  * ---
- * Manages event data and CRUD operations.
+ * Manages event data, CRUD operations, stats, and approval workflow.
  */
 import { create } from "zustand";
 import API from "../services/api";
@@ -10,6 +10,9 @@ const useEventStore = create((set, get) => ({
   // ─── State ───────────────────────────────────────────────────────
   events: [],
   currentEvent: null,
+  stats: null,
+  trendData: [],
+  activeEventsList: [],
   isLoading: false,
   error: null,
 
@@ -50,7 +53,24 @@ const useEventStore = create((set, get) => ({
   },
 
   /**
-   * Create a new event (Admin only).
+   * Fetch dashboard stats (Organization only).
+   */
+  fetchEventStats: async () => {
+    try {
+      const { data } = await API.get("/events/stats");
+      set({
+        stats: data.stats,
+        trendData: data.trendData,
+        activeEventsList: data.activeEventsList,
+      });
+      return data;
+    } catch (error) {
+      console.error("Failed to fetch stats:", error);
+    }
+  },
+
+  /**
+   * Create a new event (Organization only).
    */
   createEvent: async (eventData) => {
     set({ isLoading: true, error: null });
@@ -69,7 +89,7 @@ const useEventStore = create((set, get) => ({
   },
 
   /**
-   * Update an existing event (Admin only).
+   * Update an existing event (Organization only).
    */
   updateEvent: async (id, eventData) => {
     set({ isLoading: true, error: null });
@@ -89,7 +109,7 @@ const useEventStore = create((set, get) => ({
   },
 
   /**
-   * Delete an event (Admin only).
+   * Delete an event (Organization only).
    */
   deleteEvent: async (id) => {
     set({ isLoading: true, error: null });
@@ -107,7 +127,28 @@ const useEventStore = create((set, get) => ({
   },
 
   /**
-   * Fetch registrations for a specific event (Admin only).
+   * Update event approval status (Organization only).
+   */
+  updateApprovalStatus: async (id, approval_status) => {
+    try {
+      const { data } = await API.patch(`/events/${id}/approval`, {
+        approval_status,
+      });
+      set((state) => ({
+        events: state.events.map((e) =>
+          e._id === id ? { ...e, approval_status } : e
+        ),
+      }));
+      return data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Failed to update approval status"
+      );
+    }
+  },
+
+  /**
+   * Fetch registrations for a specific event (Organization only).
    */
   fetchEventRegistrations: async (eventId) => {
     try {

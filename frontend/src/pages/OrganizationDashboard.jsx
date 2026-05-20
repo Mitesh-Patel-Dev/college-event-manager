@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import {
-  FiPlus, FiEdit2, FiTrash2, FiUsers, FiCalendar,
-  FiX, FiChevronDown, FiEye,
+  FiPlus, FiCalendar, FiUsers, FiClock,
+  FiTrendingUp, FiMapPin, FiAlertCircle,
+  FiX, FiEdit2, FiTrash2,
 } from "react-icons/fi";
 import toast from "react-hot-toast";
 import useEventStore from "../store/eventStore";
@@ -16,19 +17,98 @@ const STATUSES = ["upcoming", "ongoing", "completed", "cancelled"];
 const EMPTY_FORM = {
   title: "", description: "", category: "Workshop", date: "",
   time: "", venue: "", max_capacity: "", organizer: "", status: "upcoming",
+  budget: "", approval_status: "pending",
 };
 
+// ─── Simple SVG Line Chart ─────────────────────────────────────
+function TrendChart({ data, period }) {
+  const width = 600;
+  const height = 180;
+  const padX = 40;
+  const padY = 25;
+
+  const filteredData = useMemo(() => {
+    if (!data || data.length === 0) return [];
+    const now = new Date();
+    const daysBack = period === "7d" ? 7 : period === "12m" ? 365 : 30;
+    const cutoff = new Date(now.getTime() - daysBack * 86400000);
+    return data.filter((d) => new Date(d._id) >= cutoff);
+  }, [data, period]);
+
+  if (filteredData.length === 0) {
+    return (
+      <div className="chart-empty">
+        <p>No registration data for this period</p>
+      </div>
+    );
+  }
+
+  const maxVal = Math.max(...filteredData.map((d) => d.count), 1);
+  const points = filteredData.map((d, i) => {
+    const x = padX + (i / Math.max(filteredData.length - 1, 1)) * (width - padX * 2);
+    const y = padY + (1 - d.count / maxVal) * (height - padY * 2);
+    return { x, y, count: d.count, date: d._id };
+  });
+
+  const linePath = points.map((p, i) => `${i === 0 ? "M" : "L"} ${p.x} ${p.y}`).join(" ");
+  const areaPath = `${linePath} L ${points[points.length - 1].x} ${height - padY} L ${points[0].x} ${height - padY} Z`;
+
+  // Y-axis labels
+  const yLabels = [0, Math.round(maxVal / 2), maxVal];
+
+  return (
+    <svg viewBox={`0 0 ${width} ${height}`} className="trend-chart-svg" preserveAspectRatio="none">
+      <defs>
+        <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#89b4fa" stopOpacity="0.3" />
+          <stop offset="100%" stopColor="#89b4fa" stopOpacity="0" />
+        </linearGradient>
+        <linearGradient id="lineGrad" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor="#89b4fa" />
+          <stop offset="100%" stopColor="#cba6f7" />
+        </linearGradient>
+      </defs>
+      {/* Grid lines */}
+      {yLabels.map((val) => {
+        const y = padY + (1 - val / maxVal) * (height - padY * 2);
+        return (
+          <g key={val}>
+            <line x1={padX} y1={y} x2={width - padX} y2={y} stroke="rgba(137,180,250,0.08)" strokeWidth="1" />
+            <text x={padX - 8} y={y + 4} fill="#7f849c" fontSize="10" textAnchor="end">{val}</text>
+          </g>
+        );
+      })}
+      {/* Area fill */}
+      <path d={areaPath} fill="url(#chartGrad)" />
+      {/* Line */}
+      <path d={linePath} fill="none" stroke="url(#lineGrad)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+      {/* Dots */}
+      {points.map((p, i) => (
+        <circle key={i} cx={p.x} cy={p.y} r="3" fill="#89b4fa" stroke="#11111b" strokeWidth="1.5" />
+      ))}
+    </svg>
+  );
+}
+
+// ─── Dashboard Component ────────────────────────────────────────
 export default function OrganizationDashboard() {
-  const { events, fetchEvents, createEvent, updateEvent, deleteEvent,
-    fetchEventRegistrations, isLoading } = useEventStore();
+  const {
+    events, fetchEvents, createEvent, updateEvent, deleteEvent,
+    fetchEventRegistrations, fetchEventStats,
+    stats, trendData, activeEventsList, isLoading,
+  } = useEventStore();
 
   const [showModal, setShowModal] = useState(false);
   const [editingEvent, setEditingEvent] = useState(null);
   const [form, setForm] = useState(EMPTY_FORM);
-  const [viewingRegs, setViewingRegs] = useState(null); // { event, registrations }
+  const [viewingRegs, setViewingRegs] = useState(null);
   const [submitting, setSubmitting] = useState(false);
+  const [chartPeriod, setChartPeriod] = useState("30d");
 
-  useEffect(() => { fetchEvents(); }, []);
+  useEffect(() => {
+    fetchEvents();
+    fetchEventStats();
+  }, []);
 
   // ─── Form Handlers ──────────────────────────────────────
   const openCreate = () => {
@@ -48,6 +128,8 @@ export default function OrganizationDashboard() {
       max_capacity: event.max_capacity,
       organizer: event.organizer,
       status: event.status,
+      budget: event.budget || "",
+      approval_status: event.approval_status || "pending",
     });
     setEditingEvent(event);
     setShowModal(true);
@@ -67,6 +149,7 @@ export default function OrganizationDashboard() {
         toast.success("Event created successfully 🎉");
       }
       setShowModal(false);
+      fetchEventStats();
     } catch (err) {
       toast.error(err.message);
     } finally {
@@ -75,10 +158,11 @@ export default function OrganizationDashboard() {
   };
 
   const handleDelete = async (event) => {
-    if (!window.confirm(`Delete "${event.title}"? This will also remove all registrations.`)) return;
+    if (!window.confirm(`Delete "${event.title}"?`)) return;
     try {
       await deleteEvent(event._id);
       toast.success("Event deleted");
+      fetchEventStats();
     } catch (err) {
       toast.error(err.message);
     }
@@ -98,137 +182,113 @@ export default function OrganizationDashboard() {
       day: "numeric", month: "short", year: "numeric",
     });
 
-  const totalCapacity = events.reduce((s, e) => s + e.max_capacity, 0);
-  const totalRegistrations = events.reduce((s, e) => s + e.current_count, 0);
+  const approvalColor = (s) =>
+    s === "approved" ? "green" : s === "rejected" ? "red" : "yellow";
 
   return (
-    <div className="page-wrapper admin-dashboard">
-      <div className="container">
-        {/* ─── Header ──────────────────────────────────────── */}
-        <div className="admin-header">
-          <div>
-            <h1 className="section-title">Organization Panel</h1>
-            <p className="section-subtitle">Manage all your campus events</p>
-          </div>
-          <button className="btn btn-primary" onClick={openCreate} id="create-event-btn">
-            <FiPlus /> Create Event
-          </button>
+    <div className="org-dashboard">
+      {/* ─── Header ──────────────────────────────────────── */}
+      <div className="org-dash-header">
+        <div>
+          <h1 className="org-dash-title">Dashboard</h1>
+          <p className="org-dash-subtitle">Overview of your campus events</p>
         </div>
+        <button className="btn btn-primary" onClick={openCreate} id="create-event-btn">
+          <FiPlus /> Create Event
+        </button>
+      </div>
 
-        {/* ─── Stats ───────────────────────────────────────── */}
-        <div className="admin-stats">
-          {[
-            { label: "Total Events", value: events.length, color: "blue" },
-            { label: "Total Capacity", value: totalCapacity, color: "mauve" },
-            { label: "Registrations", value: totalRegistrations, color: "green" },
-            {
-              label: "Fill Rate",
-              value: totalCapacity > 0
-                ? `${Math.round((totalRegistrations / totalCapacity) * 100)}%`
-                : "0%",
-              color: "peach",
-            },
-          ].map((s) => (
-            <div className={`admin-stat-card admin-stat-${s.color}`} key={s.label}>
-              <span className="admin-stat-value">{s.value}</span>
-              <span className="admin-stat-label">{s.label}</span>
+      {/* ─── Stats Cards ─────────────────────────────────── */}
+      <div className="org-stats-grid">
+        {[
+          {
+            icon: FiCalendar, label: "Active Events",
+            value: stats?.activeEvents ?? 0,
+            trend: "+18%", color: "blue",
+          },
+          {
+            icon: FiUsers, label: "Total Applicants",
+            value: stats?.totalApplicants ?? 0,
+            trend: "+32%", color: "green",
+          },
+          {
+            icon: FiAlertCircle, label: "Pending Approvals",
+            value: stats?.pendingApprovals ?? 0,
+            trend: "Needs action", color: "red", isAlert: true,
+          },
+          {
+            icon: FiTrendingUp, label: "Total Capacity",
+            value: stats?.totalCapacity ?? 0,
+            trend: `${stats?.fillRate ?? 0}% filled`, color: "mauve",
+          },
+        ].map((s) => (
+          <div className={`org-stat-card org-stat-${s.color}`} key={s.label}>
+            <div className="org-stat-top">
+              <div className={`org-stat-icon-wrap org-stat-icon-${s.color}`}>
+                <s.icon size={18} />
+              </div>
+              <span className={`org-stat-trend ${s.isAlert ? "alert" : ""}`}>
+                {s.trend}
+              </span>
             </div>
-          ))}
+            <span className="org-stat-value">{s.value.toLocaleString()}</span>
+            <span className="org-stat-label">{s.label}</span>
+          </div>
+        ))}
+      </div>
+
+      {/* ─── Main Content: Chart + Active Events ─────────── */}
+      <div className="org-dash-content">
+        {/* Chart Panel */}
+        <div className="org-chart-card">
+          <div className="org-chart-header">
+            <h2 className="org-chart-title">Registration Trend</h2>
+            <div className="org-chart-periods">
+              {["7d", "30d", "12m"].map((p) => (
+                <button
+                  key={p}
+                  className={`org-period-btn ${chartPeriod === p ? "active" : ""}`}
+                  onClick={() => setChartPeriod(p)}
+                >
+                  {p}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="org-chart-body">
+            <TrendChart data={trendData} period={chartPeriod} />
+          </div>
         </div>
 
-        {/* ─── Events Table ────────────────────────────────── */}
-        {isLoading ? (
-          <div className="spinner" />
-        ) : (
-          <div className="table-wrapper">
-            <table>
-              <thead>
-                <tr>
-                  <th>Event</th>
-                  <th>Date</th>
-                  <th>Category</th>
-                  <th>Seats</th>
-                  <th>Status</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {events.length === 0 ? (
-                  <tr>
-                    <td colSpan={6} style={{ textAlign: "center", padding: "3rem", color: "var(--text-muted)" }}>
-                      No events yet. Click "Create Event" to get started.
-                    </td>
-                  </tr>
-                ) : (
-                  events.map((event) => {
-                    const fill = event.max_capacity > 0
-                      ? Math.round((event.current_count / event.max_capacity) * 100)
-                      : 0;
-                    return (
-                      <tr key={event._id}>
-                        <td>
-                          <div className="event-table-title">{event.title}</div>
-                          <div className="event-table-venue">{event.venue}</div>
-                        </td>
-                        <td>{formatDate(event.date)}</td>
-                        <td><span className="badge badge-blue">{event.category}</span></td>
-                        <td>
-                          <div className="table-seat-info">
-                            <span>{event.current_count}/{event.max_capacity}</span>
-                            <div className="seat-bar" style={{ width: "80px" }}>
-                              <div
-                                className={`seat-bar-fill ${fill >= 100 ? "red" : fill >= 75 ? "yellow" : "green"}`}
-                                style={{ width: `${Math.min(fill, 100)}%` }}
-                              />
-                            </div>
-                          </div>
-                        </td>
-                        <td>
-                          <span className={`badge badge-${
-                            event.status === "upcoming" ? "blue"
-                            : event.status === "ongoing" ? "green"
-                            : event.status === "completed" ? "yellow"
-                            : "red"
-                          }`}>
-                            {event.status}
-                          </span>
-                        </td>
-                        <td>
-                          <div className="table-actions">
-                            <button
-                              className="icon-btn blue"
-                              title="View Registrations"
-                              onClick={() => handleViewRegistrations(event)}
-                              id={`view-regs-${event._id}`}
-                            >
-                              <FiUsers size={15} />
-                            </button>
-                            <button
-                              className="icon-btn mauve"
-                              title="Edit Event"
-                              onClick={() => openEdit(event)}
-                              id={`edit-event-${event._id}`}
-                            >
-                              <FiEdit2 size={15} />
-                            </button>
-                            <button
-                              className="icon-btn red"
-                              title="Delete Event"
-                              onClick={() => handleDelete(event)}
-                              id={`delete-event-${event._id}`}
-                            >
-                              <FiTrash2 size={15} />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })
-                )}
-              </tbody>
-            </table>
+        {/* Active Events Panel */}
+        <div className="org-active-card">
+          <div className="org-active-header">
+            <h2 className="org-active-title">Active Events</h2>
+            <a href="/organization/events" className="org-view-all">View All</a>
           </div>
-        )}
+          <div className="org-active-list">
+            {(activeEventsList || []).length === 0 ? (
+              <p className="org-active-empty">No active events yet</p>
+            ) : (
+              activeEventsList.map((evt) => (
+                <div className="org-active-item" key={evt._id}>
+                  <div className={`org-active-dot dot-${approvalColor(evt.approval_status)}`} />
+                  <div className="org-active-info">
+                    <span className="org-active-name">{evt.title}</span>
+                    <span className="org-active-meta">
+                      <FiCalendar size={11} /> {formatDate(evt.date)}
+                      <span className="meta-sep">·</span>
+                      <FiMapPin size={11} /> {evt.venue}
+                    </span>
+                  </div>
+                  <span className={`badge badge-${approvalColor(evt.approval_status)}`}>
+                    {evt.approval_status?.toUpperCase()}
+                  </span>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
       </div>
 
       {/* ─── Create/Edit Modal ────────────────────────────── */}
@@ -239,11 +299,7 @@ export default function OrganizationDashboard() {
               <h2 className="modal-title">
                 {editingEvent ? "Edit Event" : "Create New Event"}
               </h2>
-              <button
-                className="modal-close"
-                onClick={() => setShowModal(false)}
-                id="modal-close-btn"
-              >
+              <button className="modal-close" onClick={() => setShowModal(false)} id="modal-close-btn">
                 <FiX />
               </button>
             </div>
@@ -251,24 +307,19 @@ export default function OrganizationDashboard() {
             <form onSubmit={handleSubmit}>
               <div className="form-group">
                 <label className="form-label">Event Title *</label>
-                <input
-                  name="title" className="form-control"
+                <input name="title" className="form-control"
                   placeholder="e.g. React.js Workshop 2025"
                   value={form.title} onChange={handleChange} required
-                  id="event-title-input"
-                />
+                  id="event-title-input" />
               </div>
 
               <div className="form-group">
                 <label className="form-label">Description *</label>
-                <textarea
-                  name="description" className="form-control"
+                <textarea name="description" className="form-control"
                   placeholder="Describe the event..."
                   value={form.description} onChange={handleChange}
-                  rows={3} required
-                  id="event-desc-input"
-                  style={{ resize: "vertical" }}
-                />
+                  rows={3} required id="event-desc-input"
+                  style={{ resize: "vertical" }} />
               </div>
 
               <div className="modal-grid-2">
@@ -310,7 +361,14 @@ export default function OrganizationDashboard() {
                     value={form.max_capacity} onChange={handleChange}
                     required min={1} id="event-capacity-input" />
                 </div>
-                <div className="form-group modal-full">
+                <div className="form-group">
+                  <label className="form-label">Budget (₹)</label>
+                  <input type="number" name="budget" className="form-control"
+                    placeholder="e.g. 5000"
+                    value={form.budget} onChange={handleChange}
+                    min={0} id="event-budget-input" />
+                </div>
+                <div className="form-group">
                   <label className="form-label">Organizer</label>
                   <input type="text" name="organizer" className="form-control"
                     placeholder="e.g. Computer Science Dept."
@@ -338,7 +396,7 @@ export default function OrganizationDashboard() {
           <div className="modal modal-lg" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <div>
-                <h2 className="modal-title">Registrations</h2>
+                <h2 className="modal-title">Applications</h2>
                 <p style={{ fontSize: "0.82rem", color: "var(--text-muted)" }}>
                   {viewingRegs.event.title}
                 </p>
@@ -350,12 +408,12 @@ export default function OrganizationDashboard() {
 
             <p className="regs-count">
               {viewingRegs.registrations.length} student
-              {viewingRegs.registrations.length !== 1 ? "s" : ""} registered
+              {viewingRegs.registrations.length !== 1 ? "s" : ""} applied
             </p>
 
             {viewingRegs.registrations.length === 0 ? (
               <p style={{ textAlign: "center", color: "var(--text-muted)", padding: "2rem" }}>
-                No students registered yet.
+                No students have applied yet.
               </p>
             ) : (
               <div className="regs-list">
