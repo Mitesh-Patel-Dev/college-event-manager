@@ -10,6 +10,7 @@ import {
   FiCheckCircle,
   FiClock,
   FiTarget,
+  FiCircle,
 } from "react-icons/fi";
 import {
   BarChart,
