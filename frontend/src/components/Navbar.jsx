@@ -33,7 +33,7 @@ export default function Navbar() {
             <FiCalendar />
           </div>
           <span className="navbar-logo-text">
-            Event<span className="logo-accent">Hub</span>
+            College<span className="logo-accent">Event</span>
           </span>
         </Link>
 

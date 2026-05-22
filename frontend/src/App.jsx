@@ -13,6 +13,13 @@ import EventDetailPage from "./pages/EventDetailPage";
 import StudentDashboard from "./pages/StudentDashboard";
 import OrganizationDashboard from "./pages/OrganizationDashboard";
 import OrgEventsPage from "./pages/OrgEventsPage";
+import ApprovalsPage from "./pages/ApprovalsPage";
+import ChecklistPage from "./pages/ChecklistPage";
+import MarketingPage from "./pages/MarketingPage";
+import RiskMatrixPage from "./pages/RiskMatrixPage";
+import DBSchemaPage from "./pages/DBSchemaPage";
+import UserRolesPage from "./pages/UserRolesPage";
+import TechStackPage from "./pages/TechStackPage";
 
 // ─── Route Guards ────────────────────────────────────────────
 const PrivateRoute = ({ children }) => {
@@ -45,6 +52,15 @@ function OrgLayout({ children }) {
   );
 }
 
+// Helper to wrap org routes
+function OrgPage({ component: Component }) {
+  return (
+    <OrganizationRoute>
+      <OrgLayout><Component /></OrgLayout>
+    </OrganizationRoute>
+  );
+}
+
 // ─── App ────────────────────────────────────────────────────
 export default function App() {
   const location = useLocation();
@@ -69,30 +85,20 @@ export default function App() {
           <Route path="/dashboard" element={<PrivateRoute><StudentDashboard /></PrivateRoute>} />
 
           {/* Organization protected — with sidebar layout */}
-          <Route
-            path="/organization"
-            element={
-              <OrganizationRoute>
-                <OrgLayout><OrganizationDashboard /></OrgLayout>
-              </OrganizationRoute>
-            }
-          />
-          <Route
-            path="/organization/events"
-            element={
-              <OrganizationRoute>
-                <OrgLayout><OrgEventsPage /></OrgLayout>
-              </OrganizationRoute>
-            }
-          />
-          <Route
-            path="/organization/applications"
-            element={
-              <OrganizationRoute>
-                <OrgLayout><OrgEventsPage /></OrgLayout>
-              </OrganizationRoute>
-            }
-          />
+          <Route path="/organization" element={<OrgPage component={OrganizationDashboard} />} />
+          <Route path="/organization/events" element={<OrgPage component={OrgEventsPage} />} />
+          <Route path="/organization/approvals" element={<OrgPage component={ApprovalsPage} />} />
+          <Route path="/organization/applications" element={<OrgPage component={ApprovalsPage} />} />
+          
+          {/* Categories */}
+          <Route path="/organization/checklist" element={<OrgPage component={ChecklistPage} />} />
+          <Route path="/organization/marketing" element={<OrgPage component={MarketingPage} />} />
+          <Route path="/organization/risk-matrix" element={<OrgPage component={RiskMatrixPage} />} />
+          
+          {/* Architecture */}
+          <Route path="/organization/db-schema" element={<OrgPage component={DBSchemaPage} />} />
+          <Route path="/organization/user-roles" element={<OrgPage component={UserRolesPage} />} />
+          <Route path="/organization/tech-stack" element={<OrgPage component={TechStackPage} />} />
 
           {/* Fallback */}
           <Route path="*" element={<Navigate to="/" replace />} />

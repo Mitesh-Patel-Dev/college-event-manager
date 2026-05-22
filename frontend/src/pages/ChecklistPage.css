@@ -1,0 +1,405 @@
+/* ============================================================
+   ChecklistPage — Premium Dark-Theme Styles
+   ============================================================ */
+
+.checklist-page {
+  position: relative;
+  overflow: hidden;
+}
+
+/* ─── Decorative Orbs ─────────────────────────────────────────── */
+.cl-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(120px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.cl-orb-1 {
+  width: 500px;
+  height: 500px;
+  background: rgba(137, 180, 250, 0.06);
+  top: -150px;
+  right: -120px;
+}
+
+.cl-orb-2 {
+  width: 400px;
+  height: 400px;
+  background: rgba(166, 227, 161, 0.05);
+  bottom: -100px;
+  left: -100px;
+}
+
+/* ─── Header ──────────────────────────────────────────────────── */
+.cl-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  position: relative;
+  z-index: 1;
+}
+
+.cl-header-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.cl-header-icon {
+  vertical-align: -3px;
+  margin-right: 0.4rem;
+  color: var(--accent-blue);
+}
+
+.cl-header-stats {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.cl-stat-completed {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 1rem;
+  background: rgba(166, 227, 161, 0.1);
+  border: 1px solid rgba(166, 227, 161, 0.25);
+  border-radius: var(--radius-full);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--accent-green);
+}
+
+/* ─── Overall Progress Bar ────────────────────────────────────── */
+.cl-progress-wrapper {
+  border-radius: var(--radius-lg);
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.75rem;
+  position: relative;
+  z-index: 1;
+}
+
+.cl-progress-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.6rem;
+}
+
+.cl-progress-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.cl-progress-value {
+  font-family: var(--font-heading);
+  font-size: 1.1rem;
+  font-weight: 700;
+  background: var(--grad-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.cl-progress-bar {
+  width: 100%;
+  height: 10px;
+  background: var(--bg-surface0);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+
+.cl-progress-fill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  background: var(--grad-primary);
+  box-shadow: 0 0 14px rgba(137, 180, 250, 0.35);
+}
+
+.cl-progress-fill.mid {
+  background: linear-gradient(90deg, var(--accent-blue), var(--accent-green));
+  box-shadow: 0 0 14px rgba(166, 227, 161, 0.3);
+}
+
+.cl-progress-fill.complete {
+  background: linear-gradient(90deg, var(--accent-green), #40c057);
+  box-shadow: 0 0 20px rgba(166, 227, 161, 0.5);
+}
+
+.cl-progress-sections {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.cl-progress-sec-item {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.cl-sec-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.cl-sec-dot-blue { background: var(--accent-blue); }
+.cl-sec-dot-yellow { background: var(--accent-yellow); }
+.cl-sec-dot-green { background: var(--accent-green); }
+
+.cl-sec-name {
+  font-weight: 500;
+}
+
+.cl-sec-pct {
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+/* ─── Columns Layout ──────────────────────────────────────────── */
+.cl-columns {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+  position: relative;
+  z-index: 1;
+}
+
+/* ─── Column Cards ────────────────────────────────────────────── */
+.cl-column {
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  transition: var(--transition);
+  position: relative;
+  overflow: hidden;
+}
+
+.cl-column::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}
+
+.cl-column-blue::before {
+  background: linear-gradient(90deg, var(--accent-blue), rgba(137, 180, 250, 0.2));
+}
+
+.cl-column-yellow::before {
+  background: linear-gradient(90deg, var(--accent-yellow), rgba(249, 226, 175, 0.2));
+}
+
+.cl-column-green::before {
+  background: linear-gradient(90deg, var(--accent-green), rgba(166, 227, 161, 0.2));
+}
+
+.cl-column:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-glow);
+}
+
+/* Column Header */
+.cl-col-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.cl-col-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+  flex-shrink: 0;
+}
+
+.cl-col-icon-blue {
+  background: rgba(137, 180, 250, 0.15);
+  color: var(--accent-blue);
+}
+
+.cl-col-icon-yellow {
+  background: rgba(249, 226, 175, 0.15);
+  color: var(--accent-yellow);
+}
+
+.cl-col-icon-green {
+  background: rgba(166, 227, 161, 0.15);
+  color: var(--accent-green);
+}
+
+.cl-col-title {
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+.cl-col-subtitle {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 1px;
+}
+
+.cl-col-count {
+  margin-left: auto;
+  font-size: 0.72rem;
+  flex-shrink: 0;
+}
+
+/* Column Mini Progress */
+.cl-col-progress-bar {
+  width: 100%;
+  height: 4px;
+  background: var(--bg-surface0);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+
+.cl-col-progress-fill {
+  height: 100%;
+  border-radius: var(--radius-full);
+}
+
+.cl-col-fill-blue { background: var(--accent-blue); }
+.cl-col-fill-yellow { background: var(--accent-yellow); }
+.cl-col-fill-green { background: var(--accent-green); }
+
+/* ─── Task List ───────────────────────────────────────────────── */
+.cl-task-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.cl-task-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.6rem 0.75rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: var(--transition);
+  user-select: none;
+  border: 1px solid transparent;
+}
+
+.cl-task-item:hover {
+  background: rgba(137, 180, 250, 0.06);
+  border-color: rgba(137, 180, 250, 0.1);
+}
+
+.cl-task-check {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.cl-check-icon {
+  font-size: 1.15rem;
+  color: var(--text-muted);
+  transition: var(--transition);
+}
+
+.cl-check-active {
+  color: var(--accent-green);
+  filter: drop-shadow(0 0 6px rgba(166, 227, 161, 0.5));
+}
+
+.cl-task-label {
+  flex: 1;
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  transition: var(--transition);
+}
+
+.cl-task-done .cl-task-label {
+  text-decoration: line-through;
+  color: var(--text-muted);
+  opacity: 0.65;
+}
+
+.cl-priority-badge {
+  font-size: 0.65rem;
+  padding: 0.15rem 0.55rem;
+  flex-shrink: 0;
+}
+
+/* ─── Completion Banner ───────────────────────────────────────── */
+.cl-complete-banner {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  border-radius: var(--radius-lg);
+  padding: 1.5rem 2rem;
+  margin-top: 1.75rem;
+  border: 1px solid rgba(166, 227, 161, 0.3) !important;
+  position: relative;
+  z-index: 1;
+}
+
+.cl-complete-icon {
+  font-size: 2rem;
+  color: var(--accent-green);
+  filter: drop-shadow(0 0 10px rgba(166, 227, 161, 0.6));
+  flex-shrink: 0;
+}
+
+.cl-complete-title {
+  font-family: var(--font-heading);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--accent-green);
+  margin-bottom: 0.2rem;
+}
+
+.cl-complete-desc {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+/* ─── Responsive ──────────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .cl-columns {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .cl-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .cl-progress-sections {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .cl-complete-banner {
+    flex-direction: column;
+    text-align: center;
+    padding: 1.5rem;
+  }
+}

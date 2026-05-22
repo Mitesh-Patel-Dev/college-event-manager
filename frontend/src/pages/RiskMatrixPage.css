@@ -1,0 +1,316 @@
+/* ============================================================
+   Risk Matrix Page — Styles
+   ============================================================ */
+
+.risk-page {
+  position: relative;
+  overflow: hidden;
+}
+
+/* ─── Decorative Orbs ──────────────────────────────────────── */
+.risk-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(120px);
+  pointer-events: none;
+  z-index: 0;
+}
+.risk-orb-1 {
+  width: 500px; height: 500px;
+  background: rgba(243, 139, 168, 0.06);
+  top: -100px; right: -150px;
+}
+.risk-orb-2 {
+  width: 400px; height: 400px;
+  background: rgba(249, 226, 175, 0.05);
+  bottom: 200px; left: -100px;
+}
+
+/* ─── Header ───────────────────────────────────────────────── */
+.risk-header {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
+  position: relative;
+  z-index: 1;
+}
+
+.risk-header-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-md);
+  background: rgba(243, 139, 168, 0.15);
+  color: var(--accent-red);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+/* ─── Legend ────────────────────────────────────────────────── */
+.risk-legend {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+  position: relative;
+  z-index: 1;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+/* ─── Matrix Wrapper ───────────────────────────────────────── */
+.matrix-wrapper {
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  margin-bottom: 3rem;
+  position: relative;
+  z-index: 1;
+  overflow-x: auto;
+}
+
+.matrix-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 500px;
+}
+
+/* ─── Grid Area ────────────────────────────────────────────── */
+.matrix-grid-area {
+  display: grid;
+  grid-template-columns: 120px repeat(5, 1fr);
+  gap: 6px;
+  width: 100%;
+  max-width: 700px;
+}
+
+.matrix-corner {
+  /* empty top-left cell */
+}
+
+.matrix-col-header,
+.matrix-row-header {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0.4rem;
+}
+
+.matrix-row-header {
+  justify-content: flex-end;
+  padding-right: 0.85rem;
+}
+
+.matrix-cell {
+  aspect-ratio: 1;
+  border-radius: var(--radius-sm);
+  border: 1px solid;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: default;
+  transition: var(--transition);
+  min-height: 60px;
+}
+
+/* ─── Axis Labels ──────────────────────────────────────────── */
+.matrix-y-label,
+.matrix-x-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  opacity: 0.6;
+}
+
+.matrix-y-label {
+  align-self: flex-start;
+  margin-bottom: 0.25rem;
+}
+
+.matrix-x-label {
+  margin-top: 0.25rem;
+}
+
+/* ─── Risk Items ───────────────────────────────────────────── */
+.risk-items-header {
+  position: relative;
+  z-index: 1;
+  margin-bottom: 0.5rem;
+}
+
+.risk-items-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: 1.25rem;
+  position: relative;
+  z-index: 1;
+  margin-bottom: 3rem;
+}
+
+.risk-item {
+  border-radius: var(--radius-lg) !important;
+  padding: 1.5rem !important;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.risk-item-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.risk-item-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+  flex-shrink: 0;
+}
+
+.risk-item-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.risk-item-name {
+  font-family: var(--font-heading);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.35rem;
+}
+
+.risk-item-tags {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.risk-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: var(--bg-surface0);
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius-full);
+}
+
+.risk-level-badge {
+  padding: 0.25rem 0.8rem;
+  border-radius: var(--radius-full);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* ─── Mitigation ───────────────────────────────────────────── */
+.risk-mitigation {
+  background: rgba(137, 180, 250, 0.04);
+  border: 1px solid rgba(137, 180, 250, 0.08);
+  border-radius: var(--radius-md);
+  padding: 0.85rem 1rem;
+}
+
+.risk-mitigation-label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--accent-green);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.35rem;
+}
+
+.risk-mitigation-text {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+/* ─── Summary Stats ────────────────────────────────────────── */
+.risk-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 1rem;
+  position: relative;
+  z-index: 1;
+}
+
+.risk-stat {
+  border-radius: var(--radius-lg) !important;
+  padding: 1.25rem !important;
+  text-align: center;
+}
+
+.risk-stat-value {
+  display: block;
+  font-family: var(--font-heading);
+  font-size: 2rem;
+  font-weight: 800;
+  margin-bottom: 0.2rem;
+}
+
+.risk-stat-label {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* ─── Responsive ───────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .risk-items-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .matrix-wrapper {
+    padding: 1.25rem;
+  }
+
+  .risk-summary {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .risk-item-top {
+    flex-wrap: wrap;
+  }
+}

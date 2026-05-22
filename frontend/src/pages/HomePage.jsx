@@ -100,7 +100,7 @@ export default function HomePage() {
       <section className="features-section">
         <div className="container">
           <div className="section-header">
-            <h2 className="section-title">Why EventHub?</h2>
+            <h2 className="section-title">Why College Event Manager?</h2>
             <p className="section-subtitle">
               Built with cutting-edge technology to give students the best
               registration experience

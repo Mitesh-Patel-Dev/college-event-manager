@@ -1,7 +1,8 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import {
-  FiGrid, FiCalendar, FiUsers, FiLogOut, FiChevronLeft,
-  FiMenu,
+  FiGrid, FiCalendar, FiCheckCircle, FiCheckSquare,
+  FiTrendingUp, FiShield, FiDatabase, FiUsers as FiRoles,
+  FiCpu, FiLogOut, FiChevronLeft, FiMenu,
 } from "react-icons/fi";
 import useAuthStore from "../store/authStore";
 import useEventStore from "../store/eventStore";
@@ -21,20 +22,54 @@ export default function Sidebar() {
     navigate("/");
   };
 
-  const navItems = [
+  /* ─── Navigation Structure ─────────────────────────────── */
+  const mainNav = [
     { to: "/organization", icon: FiGrid, label: "Dashboard", end: true },
     { to: "/organization/events", icon: FiCalendar, label: "Events" },
     {
-      to: "/organization/applications",
-      icon: FiUsers,
-      label: "Applications",
+      to: "/organization/approvals",
+      icon: FiCheckCircle,
+      label: "Approvals",
       badge: stats?.pendingApprovals || 0,
     },
   ];
 
+  const categoryNav = [
+    { to: "/organization/checklist", icon: FiCheckSquare, label: "Checklist" },
+    { to: "/organization/marketing", icon: FiTrendingUp, label: "Marketing" },
+    { to: "/organization/risk-matrix", icon: FiShield, label: "Risk Matrix" },
+  ];
+
+  const architectureNav = [
+    { to: "/organization/db-schema", icon: FiDatabase, label: "DB Schema" },
+    { to: "/organization/user-roles", icon: FiRoles, label: "User Roles" },
+    { to: "/organization/tech-stack", icon: FiCpu, label: "Tech Stack" },
+  ];
+
+  const renderLink = (item) => (
+    <NavLink
+      key={item.to}
+      to={item.to}
+      end={item.end}
+      className={({ isActive }) => `sidebar-link ${isActive ? "active" : ""}`}
+      title={collapsed ? item.label : ""}
+    >
+      <item.icon className="sidebar-link-icon" size={18} />
+      {!collapsed && (
+        <>
+          <span className="sidebar-link-text">{item.label}</span>
+          {item.badge > 0 && (
+            <span className="sidebar-badge">{item.badge}</span>
+          )}
+        </>
+      )}
+      {collapsed && item.badge > 0 && <span className="sidebar-badge-dot" />}
+    </NavLink>
+  );
+
   return (
     <aside className={`sidebar ${collapsed ? "sidebar-collapsed" : ""}`}>
-      {/* Logo */}
+      {/* ─── Logo ──────────────────────────────────────────── */}
       <div className="sidebar-header">
         {!collapsed && (
           <div className="sidebar-logo">
@@ -42,7 +77,7 @@ export default function Sidebar() {
               <FiCalendar />
             </div>
             <span className="sidebar-logo-text">
-              Event<span className="logo-accent">Hub</span>
+              College<span className="logo-accent">Event</span>
             </span>
           </div>
         )}
@@ -55,35 +90,29 @@ export default function Sidebar() {
         </button>
       </div>
 
-      {/* Navigation */}
+      {/* ─── Main Navigation ───────────────────────────────── */}
       <nav className="sidebar-nav">
-        {navItems.map((item) => (
-          <NavLink
-            key={item.to}
-            to={item.to}
-            end={item.end}
-            className={({ isActive }) =>
-              `sidebar-link ${isActive ? "active" : ""}`
-            }
-            title={collapsed ? item.label : ""}
-          >
-            <item.icon className="sidebar-link-icon" size={18} />
-            {!collapsed && (
-              <>
-                <span className="sidebar-link-text">{item.label}</span>
-                {item.badge > 0 && (
-                  <span className="sidebar-badge">{item.badge}</span>
-                )}
-              </>
-            )}
-            {collapsed && item.badge > 0 && (
-              <span className="sidebar-badge-dot" />
-            )}
-          </NavLink>
-        ))}
+        <div className="sidebar-section">
+          {!collapsed && <span className="sidebar-section-label">Main</span>}
+          {mainNav.map(renderLink)}
+        </div>
+
+        <div className="sidebar-divider" />
+
+        <div className="sidebar-section">
+          {!collapsed && <span className="sidebar-section-label">Categories</span>}
+          {categoryNav.map(renderLink)}
+        </div>
+
+        <div className="sidebar-divider" />
+
+        <div className="sidebar-section">
+          {!collapsed && <span className="sidebar-section-label">Architecture</span>}
+          {architectureNav.map(renderLink)}
+        </div>
       </nav>
 
-      {/* User Profile at Bottom */}
+      {/* ─── User Profile at Bottom ────────────────────────── */}
       <div className="sidebar-footer">
         <div className="sidebar-user">
           <div className="sidebar-avatar">

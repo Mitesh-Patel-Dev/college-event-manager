@@ -16,7 +16,7 @@ export default function Footer() {
                 <FiCalendar />
               </div>
               <span className="footer-logo-text">
-                Event<span className="logo-accent">Hub</span>
+                College<span className="logo-accent">Event</span>
               </span>
             </Link>
             <p className="footer-desc">
@@ -73,7 +73,7 @@ export default function Footer() {
         </div>
 
         <div className="footer-bottom">
-          <p>&copy; {currentYear} Smart College Event Manager. All rights reserved.</p>
+          <p>&copy; {currentYear} College Event Manager. Created by <strong>Rudra Bisht</strong> &amp; <strong>Mohit Panchal</strong>. All rights reserved.</p>
           <div className="footer-bottom-links">
             <a href="#">Security</a>
             <span className="divider">·</span>

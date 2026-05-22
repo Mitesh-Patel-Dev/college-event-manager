@@ -1,0 +1,302 @@
+/* ============================================================
+   User Roles Page — Styles
+   ============================================================ */
+
+.roles-page {
+  position: relative;
+  overflow: hidden;
+}
+
+/* ─── Decorative Orbs ──────────────────────────────────────── */
+.roles-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(120px);
+  pointer-events: none;
+  z-index: 0;
+}
+.roles-orb-1 {
+  width: 500px; height: 500px;
+  background: rgba(137, 180, 250, 0.06);
+  top: -100px; left: -150px;
+}
+.roles-orb-2 {
+  width: 400px; height: 400px;
+  background: rgba(203, 166, 247, 0.05);
+  bottom: 200px; right: -100px;
+}
+
+/* ─── Header ───────────────────────────────────────────────── */
+.roles-header {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+  position: relative;
+  z-index: 1;
+}
+
+.roles-header-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-md);
+  background: rgba(203, 166, 247, 0.15);
+  color: var(--accent-mauve);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+/* ─── Role Cards ───────────────────────────────────────────── */
+.roles-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+  gap: 1.5rem;
+  position: relative;
+  z-index: 1;
+  margin-bottom: 3rem;
+}
+
+.role-card {
+  border-radius: var(--radius-lg) !important;
+  padding: 1.75rem !important;
+}
+
+.role-card-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.role-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.role-icon-student {
+  background: rgba(137, 180, 250, 0.15);
+  color: var(--accent-blue);
+}
+
+.role-icon-org {
+  background: rgba(203, 166, 247, 0.15);
+  color: var(--accent-mauve);
+}
+
+.role-card-title {
+  font-family: var(--font-heading);
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.role-card-sub {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+/* ─── Permissions Lists ────────────────────────────────────── */
+.role-perms-section {
+  margin-bottom: 1.25rem;
+}
+
+.role-perms-section:last-child {
+  margin-bottom: 0;
+}
+
+.role-perms-label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.65rem;
+}
+
+.role-perms-can {
+  color: var(--accent-green);
+}
+
+.role-perms-cannot {
+  color: var(--accent-red);
+}
+
+.role-perms-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.role-perm-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  padding: 0.45rem 0.75rem;
+  border-radius: var(--radius-sm);
+  transition: background 0.15s ease;
+}
+
+.role-perm-item:hover {
+  background: rgba(137, 180, 250, 0.03);
+}
+
+.role-perm-allowed {
+  color: var(--text-secondary);
+}
+
+.role-perm-allowed svg {
+  color: var(--accent-green);
+}
+
+.role-perm-denied {
+  color: var(--text-muted);
+}
+
+.role-perm-denied svg {
+  color: var(--accent-red);
+  opacity: 0.6;
+}
+
+/* ─── Permissions Matrix Table ─────────────────────────────── */
+.permissions-section {
+  position: relative;
+  z-index: 1;
+  margin-bottom: 3rem;
+}
+
+.permissions-table {
+  width: 100%;
+}
+
+.th-role {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.perm-feature {
+  font-weight: 500;
+}
+
+.perm-check {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(166, 227, 161, 0.12);
+  color: var(--accent-green);
+  font-size: 0.85rem;
+}
+
+.perm-cross {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(243, 139, 168, 0.1);
+  color: var(--accent-red);
+  font-size: 0.85rem;
+  opacity: 0.6;
+}
+
+/* ─── JWT Auth Flow ────────────────────────────────────────── */
+.auth-flow-section {
+  position: relative;
+  z-index: 1;
+  margin-bottom: 2rem;
+}
+
+.auth-flow {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.auth-flow-step-wrapper {
+  display: flex;
+  align-items: center;
+}
+
+.auth-flow-step {
+  border-radius: var(--radius-lg) !important;
+  padding: 1.25rem 1.5rem !important;
+  text-align: center;
+  min-width: 130px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.auth-step-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(137, 180, 250, 0.12);
+  color: var(--accent-blue);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  margin-bottom: 0.25rem;
+}
+
+.auth-step-label {
+  font-family: var(--font-heading);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.auth-step-sub {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.auth-flow-arrow {
+  color: var(--accent-blue);
+  font-size: 1.1rem;
+  padding: 0 0.5rem;
+  opacity: 0.5;
+}
+
+/* ─── Responsive ───────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .roles-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .auth-flow {
+    flex-direction: column;
+  }
+
+  .auth-flow-arrow {
+    transform: rotate(90deg);
+    padding: 0.35rem 0;
+  }
+
+  .auth-flow-step {
+    min-width: 200px;
+  }
+}
