@@ -13,6 +13,7 @@ import registrationRoutes from "./routes/registrationRoutes.js";
 import notificationRoutes from "./routes/notificationRoutes.js";
 import feedbackRoutes from "./routes/feedbackRoutes.js";
 import certificateRoutes from "./routes/certificateRoutes.js";
+import seedRoutes from "./routes/seedRoutes.js";
 
 // ─── ES Module __dirname workaround ───────────────────────────────
 const __filename = fileURLToPath(import.meta.url);
@@ -51,6 +52,7 @@ app.use("/api/registrations", registrationRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/feedback", feedbackRoutes);
 app.use("/api/certificates", certificateRoutes);
+app.use("/api/seed", seedRoutes);
 
 // ─── Serve Frontend in Production ──────────────────────────────────
 if (process.env.NODE_ENV === "production") {
